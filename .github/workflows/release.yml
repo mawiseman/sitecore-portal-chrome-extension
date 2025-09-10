@@ -10,6 +10,11 @@ on:
         description: 'Version number (e.g., 1.0.1)'
         required: true
         type: string
+      update_manifest:
+        description: 'Update manifest.json and commit changes'
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -21,6 +26,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Set version from tag or input
       id: version
@@ -33,11 +41,38 @@ jobs:
           echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         fi
 
+    - name: Configure Git
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_manifest }}
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
     - name: Update manifest version
       run: |
         cd src
-        sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' manifest.json
-        echo "Updated manifest.json version to ${{ steps.version.outputs.version }}"
+        CURRENT_VERSION=$(grep '"version"' manifest.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+        TARGET_VERSION="${{ steps.version.outputs.version }}"
+        
+        if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
+          sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' manifest.json
+          echo "Updated manifest.json from $CURRENT_VERSION to $TARGET_VERSION"
+          
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.update_manifest }}" = "true" ]; then
+            cd ..
+            git add src/manifest.json
+            git commit -m "chore: update manifest version to $TARGET_VERSION for release"
+            git push origin main
+            
+            # Create tag if it doesn't exist
+            if ! git rev-parse "v$TARGET_VERSION" >/dev/null 2>&1; then
+              git tag "v$TARGET_VERSION"
+              git push origin "v$TARGET_VERSION"
+              echo "Created and pushed tag v$TARGET_VERSION"
+            fi
+          fi
+        else
+          echo "Manifest version already at $TARGET_VERSION"
+        fi
 
     - name: Create extension package
       run: |
