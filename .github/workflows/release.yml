@@ -1,0 +1,113 @@
+name: Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set version from tag or input
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          echo "tag_name=v${{ inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update manifest version
+      run: |
+        cd src
+        sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' manifest.json
+        echo "Updated manifest.json version to ${{ steps.version.outputs.version }}"
+
+    - name: Create extension package
+      run: |
+        # Create build directory
+        mkdir -p build
+        
+        # Copy all source files to build directory
+        cp -r src/* build/
+        
+        # Create zip file for Chrome Web Store
+        cd build
+        zip -r ../sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip .
+        cd ..
+        
+        # Create source code archive
+        zip -r sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip . -x "*.git*" "build/*" "*.zip"
+
+    - name: Verify package contents
+      run: |
+        echo "Extension package contents:"
+        unzip -l sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
+        
+        echo "Package size:"
+        ls -lh *.zip
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.tag_name }}
+        release_name: Sitecore Portal Chrome Extension ${{ steps.version.outputs.version }}
+        body: |
+          ## Sitecore Portal Chrome Extension v${{ steps.version.outputs.version }}
+          
+          ### Installation
+          1. Download the `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` file
+          2. Extract the contents
+          3. Open Chrome and navigate to `chrome://extensions/`
+          4. Enable "Developer mode"
+          5. Click "Load unpacked" and select the extracted folder
+          
+          ### Files
+          - `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` - Chrome extension package
+          - `sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip` - Source code archive
+          
+          ### Features
+          - Generates quicklinks to your Sitecore Portal organizations and tenants
+          - Secure storage and management of portal access
+          - Background service worker for enhanced performance
+        draft: false
+        prerelease: false
+
+    - name: Upload Extension Package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
+        asset_name: sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload Source Archive
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
+        asset_name: sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
+        asset_content_type: application/zip

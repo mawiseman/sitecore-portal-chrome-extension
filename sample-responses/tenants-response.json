@@ -1,0 +1,1540 @@
+{
+    "data": {
+        "user": {
+            "applications": {
+                "totalCount": 6,
+                "edges": [
+                    {
+                        "cursor": "MA==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abc",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "Search",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-search",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Company - Nonprod",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    },
+                    {
+                        "cursor": "MQ==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abd",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "Search",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-search",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Company - Prod",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    },
+                    {
+                        "cursor": "Mg==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abe",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "Stream",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-symphony",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Company Ltd Stream",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    },
+                    {
+                        "cursor": "Mw==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abf",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "XM Cloud",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Project / PROD",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    },
+                    {
+                        "cursor": "NA==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abg",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "XM Cloud",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Project / QA",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    },
+                    {
+                        "cursor": "NQ==",
+                        "node": {
+                            "id": "12345678-abcd-1234-1234-123456789abh",
+                            "appearance": {
+                                "web": {
+                                    "actions": {
+                                        "nodes": [
+                                            {
+                                                "name": "XM Cloud",
+                                                "icon": {
+                                                    "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                    "type": "url",
+                                                    "__typename": "Icon"
+                                                },
+                                                "displayName": "Sample Project / UAT",
+                                                "__typename": "Action"
+                                            }
+                                        ],
+                                        "__typename": "ActionsConnection"
+                                    },
+                                    "__typename": "WebUserApplicationAppearance"
+                                },
+                                "__typename": "UserApplicationAppearance"
+                            },
+                            "__typename": "ContextUserApplication"
+                        },
+                        "__typename": "ContextUserApplicationsEdge"
+                    }
+                ],
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "hasPreviousPage": false,
+                    "startCursor": "MA==",
+                    "endCursor": "NQ==",
+                    "__typename": "PageInfo"
+                },
+                "nodes": [
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abc",
+                        "name": "12345678901_prod_ap-southeast-2_01",
+                        "displayName": "Sample Company - Nonprod",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abi",
+                        "productCode": "Search",
+                        "labels": [
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "nonprod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "Search",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "SubscriptionID",
+                                "value": "SAMPLE_SUBSCRIPTION_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "TenantClaims.stage",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.region",
+                                "value": "ap-southeast-2",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.domainId",
+                                "value": "12345678901",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "accountId",
+                                "value": "SAMPLE_ACCOUNT_ID_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ckey",
+                                "value": "SAMPLE_SUBSCRIPTION_123-12345678901",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "AIEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abe",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "Search",
+                                            "color": "neutral",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Show more accurate and relevant results with AI-assisted intelligent search for websites and digital properties.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/?organization=org_SampleOrgId123456&tenantId=12345678-abcd-1234-1234-123456789abc",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-search",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content and visitor catalog",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/catalog?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content analytics",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/analytics/content?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiChartBoxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Notifications",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/global/notifications?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBellCogOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Sources",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/sources?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiDatabaseImportOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Synonyms",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/global/keywords?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiClipboardFlowOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Developer resources",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Nonprod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/developer-resources?tenantId=12345678-abcd-1234-1234-123456789abc&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiToolboxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Search documentation",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://doc.sitecore.com/search",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Search React SDK",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://www.npmjs.com/package/@sitecore-search/react",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abd",
+                        "name": "123456789_prod_ap-southeast-2_01",
+                        "displayName": "Sample Company - Prod",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abi",
+                        "productCode": "Search",
+                        "labels": [
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "Search",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "SubscriptionID",
+                                "value": "SAMPLE_SUBSCRIPTION_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "TenantClaims.stage",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.region",
+                                "value": "ap-southeast-2",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.domainId",
+                                "value": "123456789",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "accountId",
+                                "value": "SAMPLE_ACCOUNT_ID_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ckey",
+                                "value": "SAMPLE_SUBSCRIPTION_123-123456789",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "AIEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abe",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "Search",
+                                            "color": "neutral",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Show more accurate and relevant results with AI-assisted intelligent search for websites and digital properties.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/?organization=org_SampleOrgId123456&tenantId=12345678-abcd-1234-1234-123456789abd",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-search",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content and visitor catalog",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/catalog?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content analytics",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/analytics/content?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiChartBoxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Notifications",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/global/notifications?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBellCogOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Sources",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/sources?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiDatabaseImportOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Synonyms",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/global/keywords?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiClipboardFlowOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Developer resources",
+                                            "color": "gray",
+                                            "displayName": "Sample Company - Prod",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://cec.sitecorecloud.io/developer-resources?tenantId=12345678-abcd-1234-1234-123456789abd&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiToolboxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Search documentation",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://doc.sitecore.com/search",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Search React SDK",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://www.npmjs.com/package/@sitecore-search/react",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abe",
+                        "name": "sample-company-stream",
+                        "displayName": "Sample Company Ltd Stream",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abj",
+                        "productCode": "ai",
+                        "labels": [
+                            {
+                                "key": "AccountId",
+                                "value": "SAMPLE_ACCOUNT_ID_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ai.CustomerEnvironmentType",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ai.edition",
+                                "value": "free",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ai.infraVersion",
+                                "value": "0.1.53",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ai.tier",
+                                "value": "T1",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "FinOpsGroup",
+                                "value": "COGS",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "FinOpsType",
+                                "value": "Customer",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "ai",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Region",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "SellableProductCode",
+                                "value": "stream",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "SubscriptionId",
+                                "value": "cst-sample-company-ltd",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "url",
+                                "value": "https://stream-aue.sitecorecloud.io",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.edition",
+                                "value": "free",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ai.azureSubscriptionId",
+                                "value": "12345678-abcd-1234-1234-123456789abo",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.MMSEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abn",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "Stream",
+                                            "color": "neutral",
+                                            "displayName": "Sample Company Ltd Stream",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Optimize your work across Sitecore with AI-enhanced workflows, Generative Copilots and Brand Aware AI.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://stream-aue.sitecorecloud.io?tenantId=12345678-abcd-1234-1234-123456789abe&region=aue&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-symphony",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Projects",
+                                            "color": "gray",
+                                            "displayName": "Sample Company Ltd Stream",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://stream-aue.sitecorecloud.io/projects?tenantId=12345678-abcd-1234-1234-123456789abe&region=aue&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-symphony",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Assistant",
+                                            "color": "gray",
+                                            "displayName": "Sample Company Ltd Stream",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://stream-aue.sitecorecloud.io/assistant?tenantId=12345678-abcd-1234-1234-123456789abe&region=aue&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-symphony",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Brand Kits",
+                                            "color": "gray",
+                                            "displayName": "Sample Company Ltd Stream",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://stream-aue.sitecorecloud.io/brandkits?tenantId=12345678-abcd-1234-1234-123456789abe&region=aue&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-symphony",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Sitecore Stream for Platform DXP",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://developers.sitecore.com/downloads/Sitecore_Stream_for_Platform_DXP",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiTrayArrowDown",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abf",
+                        "name": "sampleco0508-sampleproject25c0-prod700b",
+                        "displayName": "Sample Project / PROD",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abk",
+                        "productCode": "XMCloud",
+                        "labels": [
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "XMCloud",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Region",
+                                "value": "Australia East",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "URL",
+                                "value": "https://xmc-sampleco0508-sampleproject25c0-prod700b.sitecorecloud.io/sitecore",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectName",
+                                "value": "Sample Project",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectId",
+                                "value": "SAMPLE_PROJECT_ID_12345",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentName",
+                                "value": "PROD",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CustomerEnvironmentType",
+                                "value": "prod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CDPEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abl",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.cdp_client_key",
+                                "value": "sample1234567890abcdef1234567890ab",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentId",
+                                "value": "SAMPLE_ENV_ID_PROD_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.AIEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abe",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "XM Cloud",
+                                            "color": "neutral",
+                                            "displayName": "Sample Project / PROD",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Create, manage and deliver relevant content everywhere, lightning-fast, with a world-leading enterprise-ready CMS.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmapps.sitecorecloud.io?tenantName=sampleco0508-sampleproject25c0-prod700b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Page builder",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / PROD",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://pages.sitecorecloud.io?tenantName=sampleco0508-sampleproject25c0-prod700b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileEditOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Explorer",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / PROD",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://explorer.sitecorecloud.io?tenantName=sampleco0508-sampleproject25c0-prod700b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileTree",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content Editor",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / PROD",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmc-sampleco0508-sampleproject25c0-prod700b.sitecorecloud.io/sitecore/shell/Applications/Content Editor.aspx?sc_bw=1&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFeather",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Forms",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / PROD",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://forms.sitecorecloud.io?tenantName=sampleco0508-sampleproject25c0-prod700b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiListBoxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "XM Cloud documentation",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://doc.sitecore.com/xmc",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abg",
+                        "name": "sampleco2b52-sampleproject969e-qa238b",
+                        "displayName": "Sample Project / QA",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abk",
+                        "productCode": "XMCloud",
+                        "labels": [
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "nonprod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "XMCloud",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Region",
+                                "value": "Australia East",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "URL",
+                                "value": "https://xmc-sampleco2b52-sampleproject969e-qa238b.sitecorecloud.io/sitecore",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectName",
+                                "value": "Sample Project",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectId",
+                                "value": "SAMPLE_PROJECT_ID_12345",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentName",
+                                "value": "QA",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CustomerEnvironmentType",
+                                "value": "nonprod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CDPEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abm",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.cdp_client_key",
+                                "value": "sample1234567890abcdef1234567890ac",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentId",
+                                "value": "SAMPLE_ENV_ID_QA_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.AIEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abe",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "XM Cloud",
+                                            "color": "neutral",
+                                            "displayName": "Sample Project / QA",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Create, manage and deliver relevant content everywhere, lightning-fast, with a world-leading enterprise-ready CMS.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmapps.sitecorecloud.io?tenantName=sampleco2b52-sampleproject969e-qa238b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Page builder",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / QA",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://pages.sitecorecloud.io?tenantName=sampleco2b52-sampleproject969e-qa238b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileEditOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Explorer",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / QA",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://explorer.sitecorecloud.io?tenantName=sampleco2b52-sampleproject969e-qa238b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileTree",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content Editor",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / QA",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmc-sampleco2b52-sampleproject969e-qa238b.sitecorecloud.io/sitecore/shell/Applications/Content Editor.aspx?sc_bw=1&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFeather",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Forms",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / QA",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://forms.sitecorecloud.io?tenantName=sampleco2b52-sampleproject969e-qa238b&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiListBoxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "XM Cloud documentation",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://doc.sitecore.com/xmc",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "id": "12345678-abcd-1234-1234-123456789abh",
+                        "name": "sampleco87a2-sampleprojectbba3-uata0df",
+                        "displayName": "Sample Project / UAT",
+                        "organizationId": "org_SampleOrgId123456",
+                        "state": "Active",
+                        "systemId": "12345678-abcd-1234-1234-123456789abk",
+                        "productCode": "XMCloud",
+                        "labels": [
+                            {
+                                "key": "CustomerEnvironmentType",
+                                "value": "nonprod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Environment",
+                                "value": "production",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "ProductCode",
+                                "value": "XMCloud",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "Region",
+                                "value": "Australia East",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "RegionCode",
+                                "value": "aue",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "key": "URL",
+                                "value": "https://xmc-sampleco87a2-sampleprojectbba3-uata0df.sitecorecloud.io/sitecore",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectName",
+                                "value": "Sample Project",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.ProjectId",
+                                "value": "SAMPLE_PROJECT_ID_12345",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentName",
+                                "value": "UAT",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CustomerEnvironmentType",
+                                "value": "nonprod",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.CDPEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abm",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.cdp_client_key",
+                                "value": "sample1234567890abcdef1234567890ac",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "XMCloud.EnvironmentId",
+                                "value": "SAMPLE_ENV_ID_UAT_123",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            },
+                            {
+                                "key": "TenantClaims.AIEmbeddedTenantID",
+                                "value": "12345678-abcd-1234-1234-123456789abe",
+                                "__typename": "KeyValuePairOfStringAndString"
+                            }
+                        ],
+                        "appearance": {
+                            "web": {
+                                "actions": {
+                                    "nodes": [
+                                        {
+                                            "name": "XM Cloud",
+                                            "color": "neutral",
+                                            "displayName": "Sample Project / UAT",
+                                            "location": null,
+                                            "category": "Direct Links",
+                                            "description": "Create, manage and deliver relevant content everywhere, lightning-fast, with a world-leading enterprise-ready CMS.",
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmapps.sitecorecloud.io?tenantName=sampleco87a2-sampleprojectbba3-uata0df&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "https://delivery-sitecore.sitecorecontenthub.cloud/api/public/content/yourname-xm_cloud",
+                                                "type": "url",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Page builder",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / UAT",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://pages.sitecorecloud.io?tenantName=sampleco87a2-sampleprojectbba3-uata0df&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileEditOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Explorer",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / UAT",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://explorer.sitecorecloud.io?tenantName=sampleco87a2-sampleprojectbba3-uata0df&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFileTree",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Content Editor",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / UAT",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://xmc-sampleco87a2-sampleprojectbba3-uata0df.sitecorecloud.io/sitecore/shell/Applications/Content Editor.aspx?sc_bw=1&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiFeather",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "Forms",
+                                            "color": "gray",
+                                            "displayName": "Sample Project / UAT",
+                                            "location": null,
+                                            "category": "Quick Actions",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://forms.sitecorecloud.io?tenantName=sampleco87a2-sampleprojectbba3-uata0df&organization=org_SampleOrgId123456",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiListBoxOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        },
+                                        {
+                                            "name": "XM Cloud documentation",
+                                            "color": "neutral",
+                                            "displayName": null,
+                                            "location": null,
+                                            "category": "Helpful links",
+                                            "description": null,
+                                            "link": {
+                                                "type": "external-link",
+                                                "to": "https://doc.sitecore.com/xmc",
+                                                "__typename": "Link"
+                                            },
+                                            "icon": {
+                                                "src": "mdiBookOpenPageVariantOutline",
+                                                "type": "mdi",
+                                                "__typename": "Icon"
+                                            },
+                                            "__typename": "Action"
+                                        }
+                                    ],
+                                    "__typename": "ActionsConnection"
+                                },
+                                "__typename": "WebUserApplicationAppearance"
+                            },
+                            "__typename": "UserApplicationAppearance"
+                        },
+                        "__typename": "ContextUserApplication"
+                    }
+                ],
+                "__typename": "ContextUserApplicationsConnection"
+            },
+            "__typename": "ContextUser"
+        }
+    }
+}
+
+
+
+
+

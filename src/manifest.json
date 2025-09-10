@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Sitecore Portal Quicklinks",
+  "author": "mark@wiseman.net.au",
+  "version": "1.0",
+  "homepage_url": "https://wiseman.net.au",
+  "description": "Generates quicklins to your Sitecore Portal organizations and tenants.",
+  "permissions": ["storage", "activeTab", "webRequest", "alarms", "management"],
+  "host_permissions": [
+    "https://portal.sitecorecloud.io/*",
+    "https://identity.sitecorecloud.io/*"
+  ],
+  "background": {
+    "service_worker": "core/background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; style-src 'self';"
+  },
+  "action": {
+    "default_popup": "ui/popup.html",
+    "default_icon": {
+      "16": "ui/icons/icon16.png",
+      "48": "ui/icons/icon48.png",
+      "128": "ui/icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://portal.sitecorecloud.io/*"],
+      "js": [
+        "config/config.js", 
+        "utils/logger.js", 
+        "utils/asyncUtils.js", 
+        "utils/security.js", 
+        "utils/storageSecurityManager.js", 
+        "managers/errorHandler.js", 
+        "managers/contextValidator.js", 
+        "managers/requestLifecycleManager.js", 
+        "managers/storageConsistencyManager.js", 
+        "utils/sharedUtils.js", 
+        "managers/memoryManager.js", 
+        "core/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["ui/icons/*.svg", "core/secureInject.js", "managers/memoryManager.js"],
+      "matches": ["https://portal.sitecorecloud.io/*"]
+    }
+  ],
+  "icons": {
+    "16": "ui/icons/icon16.png",
+    "48": "ui/icons/icon48.png",
+    "128": "ui/icons/icon128.png"
+  }
+}

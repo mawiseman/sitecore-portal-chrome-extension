@@ -1,0 +1,77 @@
+{
+    "pageNumber": 1,
+    "pageLength": 5,
+    "totalRecords": 5,
+    "data": [
+        {
+            "id": "org_SampleOrgId123456",
+            "name": "sample-partner-1",
+            "displayName": "Sample Partner 1",
+            "type": "partner",
+            "defaultDeploymentRegion": "Australia East",
+            "createdBy": "sample.user1@example.com",
+            "accountId": "SAMPLE_ACCOUNT_ID_001",
+            "phoneNumber": null,
+            "defaultLanguage": null,
+            "mfa": {
+                "required": false
+            }
+        },
+        {
+            "id": "org_SampleOrgId123457",
+            "name": "sample-company-1",
+            "displayName": "Sample Company 1",
+            "type": "customer",
+            "defaultDeploymentRegion": "Australia East",
+            "createdBy": "sample.user2@example.com",
+            "accountId": "SAMPLE_ACCOUNT_ID_002",
+            "phoneNumber": null,
+            "defaultLanguage": null,
+            "mfa": {
+                "required": true
+            }
+        },
+        {
+            "id": "org_SampleOrgId123458",
+            "name": "sample-partner-2",
+            "displayName": "Sample Partner 2",
+            "type": "partner",
+            "defaultDeploymentRegion": "Australia East",
+            "createdBy": "yourname.user3@example.com",
+            "accountId": "SAMPLE_ACCOUNT_ID_001",
+            "phoneNumber": null,
+            "defaultLanguage": null,
+            "mfa": {
+                "required": false
+            }
+        },
+        {
+            "id": "org_SampleOrgId123459",
+            "name": "sample-company-2",
+            "displayName": "Sample Company 2",
+            "type": "customer",
+            "defaultDeploymentRegion": "Australia East",
+            "createdBy": "sample.user4@example.com",
+            "accountId": "SAMPLE_ACCOUNT_ID_003",
+            "phoneNumber": null,
+            "defaultLanguage": null,
+            "mfa": {
+                "required": true
+            }
+        },
+        {
+            "id": "org_SampleOrgId123460",
+            "name": "sample-company-3",
+            "displayName": "Sample Company 3",
+            "type": "customer",
+            "defaultDeploymentRegion": "Australia East",
+            "createdBy": "sample.user5@example.com",
+            "accountId": "SAMPLE_ACCOUNT_ID_004",
+            "phoneNumber": "+1234567890",
+            "defaultLanguage": null,
+            "mfa": {
+                "required": false
+            }
+        }
+    ]
+}
