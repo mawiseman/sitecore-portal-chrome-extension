@@ -64,50 +64,54 @@ jobs:
         ls -lh *.zip
 
     - name: Create Release
-      uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.tag_name }}
-        release_name: Sitecore Portal Chrome Extension ${{ steps.version.outputs.version }}
+        name: Sitecore Portal Chrome Extension ${{ steps.version.outputs.version }}
         body: |
           ## Sitecore Portal Chrome Extension v${{ steps.version.outputs.version }}
           
           ### Installation
+          
+          #### Option 1: Load Unpacked (Developer Mode)
           1. Download the `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` file
-          2. Extract the contents
+          2. Extract the contents to a folder
           3. Open Chrome and navigate to `chrome://extensions/`
-          4. Enable "Developer mode"
+          4. Enable "Developer mode" in the top-right corner
           5. Click "Load unpacked" and select the extracted folder
           
-          ### Files
-          - `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` - Chrome extension package
-          - `sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip` - Source code archive
+          #### Option 2: Chrome Web Store (Coming Soon)
+          Extension will be available on the Chrome Web Store for easy installation.
           
-          ### Features
-          - Generates quicklinks to your Sitecore Portal organizations and tenants
-          - Secure storage and management of portal access
-          - Background service worker for enhanced performance
+          ### Files Included
+          - `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` - Chrome extension package (ready to load)
+          - `sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip` - Complete source code archive
+          
+          ### Key Features
+          - **Automatic Detection**: Captures Sitecore Portal organizations and tenants automatically
+          - **Hierarchical Organization**: Groups tenants by product type (XM Cloud, Content Hub, etc.)
+          - **Custom Naming**: Edit organization and tenant names for better organization
+          - **Secure Navigation**: URL validation and safe browsing protection
+          - **Memory Optimized**: Efficient resource usage and cleanup
+          - **Current Context**: Visual indication of active organization
+          
+          ### Security & Privacy
+          - All data stored locally in your browser
+          - No external data transmission
+          - URL validation for safe navigation
+          - Input sanitization for security
+          
+          ### Support
+          - Author: Mark Wiseman (mark@wiseman.net.au)
+          - Homepage: https://wiseman.net.au
+          - Issues: Report bugs and request features in this repository
+          
+          ---
+          
+          🎯 **Quick Start**: Download the extension zip, extract it, and load it in Chrome's developer mode to start organizing your Sitecore Portal access!
+        files: |
+          sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
+          sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
         draft: false
         prerelease: false
-
-    - name: Upload Extension Package
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
-        asset_name: sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
-        asset_content_type: application/zip
-
-    - name: Upload Source Archive
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
-        asset_name: sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
-        asset_content_type: application/zip
+        generate_release_notes: true
