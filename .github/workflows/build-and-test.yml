@@ -1,0 +1,163 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate manifest.json
+      run: |
+        echo "Validating manifest.json..."
+        if ! jq empty src/manifest.json; then
+          echo "❌ manifest.json is not valid JSON"
+          exit 1
+        fi
+        echo "✅ manifest.json is valid JSON"
+        
+        # Check required fields
+        VERSION=$(jq -r '.version' src/manifest.json)
+        NAME=$(jq -r '.name' src/manifest.json)
+        MANIFEST_VERSION=$(jq -r '.manifest_version' src/manifest.json)
+        
+        if [ "$MANIFEST_VERSION" != "3" ]; then
+          echo "❌ Manifest version must be 3"
+          exit 1
+        fi
+        
+        if [ -z "$VERSION" ] || [ -z "$NAME" ]; then
+          echo "❌ Required fields missing in manifest.json"
+          exit 1
+        fi
+        
+        echo "✅ Manifest validation passed"
+        echo "  Name: $NAME"
+        echo "  Version: $VERSION"
+        echo "  Manifest Version: $MANIFEST_VERSION"
+
+    - name: Check file structure
+      run: |
+        echo "Checking required files and directories..."
+        
+        # Check required directories
+        for dir in "src" "src/core" "src/config" "src/managers" "src/ui" "src/utils"; do
+          if [ ! -d "$dir" ]; then
+            echo "❌ Missing required directory: $dir"
+            exit 1
+          fi
+        done
+        
+        # Check required files
+        for file in "src/manifest.json" "src/core/background.js" "src/core/content.js" "src/core/popup.js" "src/ui/popup.html"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Missing required file: $file"
+            exit 1
+          fi
+        done
+        
+        echo "✅ All required files and directories present"
+
+    - name: Check JavaScript syntax
+      run: |
+        echo "Checking JavaScript files for syntax errors..."
+        
+        # Find all .js files and check syntax
+        find src -name "*.js" -type f | while read file; do
+          if ! node --check "$file" 2>/dev/null; then
+            echo "❌ Syntax error in: $file"
+            exit 1
+          fi
+        done
+        
+        echo "✅ All JavaScript files have valid syntax"
+
+    - name: Build extension package
+      run: |
+        echo "Building extension package..."
+        
+        # Create build directory
+        mkdir -p build
+        
+        # Copy all source files
+        cp -r src/* build/
+        
+        # Create zip for testing
+        cd build
+        zip -r ../extension-test.zip . -q
+        cd ..
+        
+        # Verify zip was created
+        if [ ! -f "extension-test.zip" ]; then
+          echo "❌ Failed to create extension package"
+          exit 1
+        fi
+        
+        # Check zip size (Chrome limit is 50MB)
+        SIZE=$(stat -c%s "extension-test.zip")
+        MAX_SIZE=$((50 * 1024 * 1024))
+        
+        if [ $SIZE -gt $MAX_SIZE ]; then
+          echo "❌ Extension package exceeds 50MB limit"
+          exit 1
+        fi
+        
+        echo "✅ Extension package built successfully"
+        echo "  Size: $(($SIZE / 1024))KB"
+
+    - name: Security checks
+      run: |
+        echo "Running security checks..."
+        
+        # Check for exposed secrets or API keys
+        if grep -r "api[_-]key\s*[:=]\s*[\"'][^\"']\+[\"']" src --include="*.js" --include="*.json"; then
+          echo "⚠️  Warning: Potential hardcoded API keys found"
+        fi
+        
+        if grep -r "password\s*[:=]\s*[\"'][^\"']\+[\"']" src --include="*.js"; then
+          echo "⚠️  Warning: Potential hardcoded passwords found"
+        fi
+        
+        # Check for dangerous permissions in manifest
+        DANGEROUS_PERMS='["<all_urls>", "cookies", "debugger", "pageCapture", "proxy", "webRequestBlocking"]'
+        for perm in $(echo $DANGEROUS_PERMS | jq -r '.[]'); do
+          if jq -e ".permissions | index(\"$perm\")" src/manifest.json > /dev/null; then
+            echo "⚠️  Warning: Dangerous permission found: $perm"
+          fi
+        done
+        
+        echo "✅ Security checks completed"
+
+    - name: Generate build report
+      if: always()
+      run: |
+        echo "## Build Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "src/manifest.json" ]; then
+          VERSION=$(jq -r '.version' src/manifest.json)
+          NAME=$(jq -r '.name' src/manifest.json)
+          echo "- **Extension**: $NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: $VERSION" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Count files
+        JS_COUNT=$(find src -name "*.js" -type f | wc -l)
+        HTML_COUNT=$(find src -name "*.html" -type f | wc -l)
+        CSS_COUNT=$(find src -name "*.css" -type f | wc -l)
+        
+        echo "### File Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "- JavaScript files: $JS_COUNT" >> $GITHUB_STEP_SUMMARY
+        echo "- HTML files: $HTML_COUNT" >> $GITHUB_STEP_SUMMARY
+        echo "- CSS files: $CSS_COUNT" >> $GITHUB_STEP_SUMMARY

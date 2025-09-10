@@ -1,26 +1,27 @@
-name: Release Chrome Extension
+name: Release
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version number (e.g., 1.0.1)'
+      version_type:
+        description: 'Version bump type'
         required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        description: 'Additional release notes (optional)'
+        required: false
         type: string
-      update_manifest:
-        description: 'Update manifest.json and commit changes'
-        required: true
-        default: true
-        type: boolean
 
 permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  release:
     runs-on: ubuntu-latest
     
     steps:
@@ -30,52 +31,58 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
-    - name: Set version from tag or input
-      id: version
-      run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          echo "tag_name=v${{ inputs.version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-          echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-        fi
-
     - name: Configure Git
-      if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_manifest }}
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+    - name: Get current version
+      id: current
+      run: |
+        CURRENT_VERSION=$(grep '"version"' src/manifest.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+        echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "📌 Current version: $CURRENT_VERSION"
+
+    - name: Calculate new version
+      id: bump
+      run: |
+        CURRENT_VERSION="${{ steps.current.outputs.version }}"
+        VERSION_TYPE="${{ inputs.version_type }}"
+        
+        # Split version into components
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+        
+        case "$VERSION_TYPE" in
+          major)
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+            ;;
+          minor)
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+            ;;
+          patch)
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+            ;;
+        esac
+        
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "old_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "🚀 New version: $NEW_VERSION"
+
     - name: Update manifest version
       run: |
-        cd src
-        CURRENT_VERSION=$(grep '"version"' manifest.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
-        TARGET_VERSION="${{ steps.version.outputs.version }}"
-        
-        if [ "$CURRENT_VERSION" != "$TARGET_VERSION" ]; then
-          sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' manifest.json
-          echo "Updated manifest.json from $CURRENT_VERSION to $TARGET_VERSION"
-          
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.update_manifest }}" = "true" ]; then
-            cd ..
-            git add src/manifest.json
-            git commit -m "chore: update manifest version to $TARGET_VERSION for release"
-            git push origin main
-            
-            # Create tag if it doesn't exist
-            if ! git rev-parse "v$TARGET_VERSION" >/dev/null 2>&1; then
-              git tag "v$TARGET_VERSION"
-              git push origin "v$TARGET_VERSION"
-              echo "Created and pushed tag v$TARGET_VERSION"
-            fi
-          fi
-        else
-          echo "Manifest version already at $TARGET_VERSION"
-        fi
+        sed -i 's/"version": "[^"]*"/"version": "${{ steps.bump.outputs.new_version }}"/' src/manifest.json
+        echo "✅ Updated manifest.json to version ${{ steps.bump.outputs.new_version }}"
+
+    - name: Commit version bump
+      run: |
+        git add src/manifest.json
+        git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
+        git push origin main
 
     - name: Create extension package
       run: |
+        echo "📦 Building extension package..."
+        
         # Create build directory
         mkdir -p build
         
@@ -84,69 +91,113 @@ jobs:
         
         # Create zip file for Chrome Web Store
         cd build
-        zip -r ../sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip .
+        zip -r ../sitecore-portal-chrome-extension-${{ steps.bump.outputs.new_version }}.zip .
         cd ..
         
         # Create source code archive
-        zip -r sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip . -x "*.git*" "build/*" "*.zip"
-
-    - name: Verify package contents
-      run: |
-        echo "Extension package contents:"
-        unzip -l sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
+        zip -r sitecore-portal-chrome-extension-source-${{ steps.bump.outputs.new_version }}.zip . \
+          -x "*.git*" \
+          -x "build/*" \
+          -x "*.zip" \
+          -x "node_modules/*" \
+          -x ".github/*"
         
-        echo "Package size:"
+        echo "✅ Packages created successfully"
+
+    - name: Verify packages
+      run: |
+        echo "📋 Extension package contents:"
+        unzip -l sitecore-portal-chrome-extension-${{ steps.bump.outputs.new_version }}.zip | head -20
+        
+        echo ""
+        echo "📊 Package sizes:"
         ls -lh *.zip
 
-    - name: Create Release
+    - name: Generate changelog
+      id: changelog
+      run: |
+        VERSION="${{ steps.bump.outputs.new_version }}"
+        OLD_VERSION="${{ steps.bump.outputs.old_version }}"
+        
+        echo "## What's Changed in v$VERSION" > release_notes.md
+        echo "" >> release_notes.md
+        
+        # Add custom release notes if provided
+        if [ -n "${{ inputs.release_notes }}" ]; then
+          echo "${{ inputs.release_notes }}" >> release_notes.md
+          echo "" >> release_notes.md
+        fi
+        
+        # Get commit messages since last version
+        echo "### Commits" >> release_notes.md
+        if git rev-parse "v$OLD_VERSION" >/dev/null 2>&1; then
+          git log --pretty=format:"- %s" "v$OLD_VERSION"..HEAD --no-merges | grep -v "^- chore: bump version" >> release_notes.md || true
+        else
+          git log --pretty=format:"- %s" HEAD~10..HEAD --no-merges | grep -v "^- chore: bump version" >> release_notes.md || true
+        fi
+        
+        echo "" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        # Add installation instructions
+        cat >> release_notes.md << 'EOF'
+        ### Installation
+        
+        #### Option 1: Load Unpacked (Developer Mode)
+        1. Download the `sitecore-portal-chrome-extension-*.zip` file below
+        2. Extract the contents to a folder
+        3. Open Chrome and navigate to `chrome://extensions/`
+        4. Enable "Developer mode" in the top-right corner
+        5. Click "Load unpacked" and select the extracted folder
+        
+        #### Option 2: Chrome Web Store
+        Coming soon!
+        
+        ### Downloads
+        See the assets below for:
+        - 📦 **Extension package** - Ready to install in Chrome
+        - 📄 **Source code** - Complete source code archive
+        
+        ### Features
+        - ✨ Automatic organization and tenant detection
+        - 🏢 Hierarchical tenant grouping by product type
+        - ✏️ Custom naming for organizations and tenants
+        - 🔒 Secure URL validation and navigation
+        - 💾 Local storage with no data transmission
+        - ⚡ Optimized performance with memory management
+        EOF
+        
+        echo "" >> release_notes.md
+        echo "---" >> release_notes.md
+        echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/v$OLD_VERSION...v$VERSION" >> release_notes.md
+
+    - name: Create and push tag
+      run: |
+        git tag "v${{ steps.bump.outputs.new_version }}"
+        git push origin "v${{ steps.bump.outputs.new_version }}"
+        echo "✅ Created and pushed tag v${{ steps.bump.outputs.new_version }}"
+
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ steps.version.outputs.tag_name }}
-        name: Sitecore Portal Chrome Extension ${{ steps.version.outputs.version }}
-        body: |
-          ## Sitecore Portal Chrome Extension v${{ steps.version.outputs.version }}
-          
-          ### Installation
-          
-          #### Option 1: Load Unpacked (Developer Mode)
-          1. Download the `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` file
-          2. Extract the contents to a folder
-          3. Open Chrome and navigate to `chrome://extensions/`
-          4. Enable "Developer mode" in the top-right corner
-          5. Click "Load unpacked" and select the extracted folder
-          
-          #### Option 2: Chrome Web Store (Coming Soon)
-          Extension will be available on the Chrome Web Store for easy installation.
-          
-          ### Files Included
-          - `sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip` - Chrome extension package (ready to load)
-          - `sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip` - Complete source code archive
-          
-          ### Key Features
-          - **Automatic Detection**: Captures Sitecore Portal organizations and tenants automatically
-          - **Hierarchical Organization**: Groups tenants by product type (XM Cloud, Content Hub, etc.)
-          - **Custom Naming**: Edit organization and tenant names for better organization
-          - **Secure Navigation**: URL validation and safe browsing protection
-          - **Memory Optimized**: Efficient resource usage and cleanup
-          - **Current Context**: Visual indication of active organization
-          
-          ### Security & Privacy
-          - All data stored locally in your browser
-          - No external data transmission
-          - URL validation for safe navigation
-          - Input sanitization for security
-          
-          ### Support
-          - Author: Mark Wiseman (mark@wiseman.net.au)
-          - Homepage: https://wiseman.net.au
-          - Issues: Report bugs and request features in this repository
-          
-          ---
-          
-          🎯 **Quick Start**: Download the extension zip, extract it, and load it in Chrome's developer mode to start organizing your Sitecore Portal access!
+        tag_name: v${{ steps.bump.outputs.new_version }}
+        name: v${{ steps.bump.outputs.new_version }}
+        body_path: release_notes.md
         files: |
-          sitecore-portal-chrome-extension-${{ steps.version.outputs.version }}.zip
-          sitecore-portal-chrome-extension-source-${{ steps.version.outputs.version }}.zip
+          sitecore-portal-chrome-extension-${{ steps.bump.outputs.new_version }}.zip
+          sitecore-portal-chrome-extension-source-${{ steps.bump.outputs.new_version }}.zip
         draft: false
         prerelease: false
-        generate_release_notes: true
+
+    - name: Summary
+      run: |
+        echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version**: ${{ steps.bump.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Type**: ${{ inputs.version_type }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Tag**: v${{ steps.bump.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "1. Check the [Releases page](https://github.com/${{ github.repository }}/releases) for the new release" >> $GITHUB_STEP_SUMMARY
+        echo "2. Test the extension package" >> $GITHUB_STEP_SUMMARY
+        echo "3. Consider publishing to Chrome Web Store" >> $GITHUB_STEP_SUMMARY
