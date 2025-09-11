@@ -387,44 +387,55 @@
         const self = this;
         const originalXHR = window.XMLHttpRequest;
         
-        // Create a wrapper constructor
+        // Create a wrapper constructor using prototype override
         function SecureXMLHttpRequest() {
           const xhr = new originalXHR();
+          const self_ref = self;
           
           // Store original methods
-          const originalOpen = xhr.open;
-          const originalSend = xhr.send;
+          const originalOpen = originalXHR.prototype.open;
+          const originalSend = originalXHR.prototype.send;
           
-          // Override open method
-          xhr.open = function(method, url, ...args) {
+          // Create wrapper object with custom methods
+          const wrapper = Object.create(xhr);
+          
+          // Copy all properties from xhr to wrapper
+          for (let prop in xhr) {
+            try {
+              wrapper[prop] = xhr[prop];
+            } catch (e) {
+              // Skip read-only properties
+            }
+          }
+          
+          // Override open method on wrapper
+          wrapper.open = function(method, url, ...args) {
             this._secureInterceptor = {
               method,
               url,
-              shouldIntercept: self.shouldInterceptUrl(url),
-              id: self.interceptorId
+              shouldIntercept: self_ref.shouldInterceptUrl(url),
+              id: self_ref.interceptorId
             };
             
             if (this._secureInterceptor.shouldIntercept) {
               log.debug('🔒 Secure XHR open interception (constructor wrapper)', { method, url });
             }
             
-            return originalOpen.apply(this, [method, url, ...args]);
+            return originalOpen.apply(xhr, [method, url, ...args]);
           };
           
-          // Override send method
-          xhr.send = function(data) {
-            const xhr = this;
-            
-            if (xhr._secureInterceptor?.shouldIntercept && xhr._secureInterceptor.id === self.interceptorId) {
+          // Override send method on wrapper
+          wrapper.send = function(data) {
+            if (this._secureInterceptor?.shouldIntercept && this._secureInterceptor.id === self_ref.interceptorId) {
               const originalOnReadyStateChange = xhr.onreadystatechange;
               
               xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                   try {
-                    if (xhr._secureInterceptor.url.includes('identity.sitecorecloud.io/api/identity/v1/user/organizations')) {
-                      self.processOrganizationsXHRResponse(xhr);
-                    } else if (xhr._secureInterceptor.url.includes('/api/portal/graphql') || xhr._secureInterceptor.url.includes('graphql')) {
-                      self.processGraphQLXHRResponse(xhr, data);
+                    if (wrapper._secureInterceptor.url.includes('identity.sitecorecloud.io/api/identity/v1/user/organizations')) {
+                      self_ref.processOrganizationsXHRResponse(xhr);
+                    } else if (wrapper._secureInterceptor.url.includes('/api/portal/graphql') || wrapper._secureInterceptor.url.includes('graphql')) {
+                      self_ref.processGraphQLXHRResponse(xhr, data);
                     }
                   } catch (error) {
                     log.error('🔒 Secure XHR response processing error', error);
@@ -437,10 +448,28 @@
               };
             }
             
-            return originalSend.apply(this, [data]);
+            return originalSend.apply(xhr, [data]);
           };
           
-          return xhr;
+          // Proxy property access to the underlying xhr
+          Object.defineProperty(wrapper, 'responseText', {
+            get: function() { return xhr.responseText; }
+          });
+          Object.defineProperty(wrapper, 'response', {
+            get: function() { return xhr.response; }
+          });
+          Object.defineProperty(wrapper, 'status', {
+            get: function() { return xhr.status; }
+          });
+          Object.defineProperty(wrapper, 'readyState', {
+            get: function() { return xhr.readyState; }
+          });
+          Object.defineProperty(wrapper, 'onreadystatechange', {
+            get: function() { return xhr.onreadystatechange; },
+            set: function(val) { xhr.onreadystatechange = val; }
+          });
+          
+          return wrapper;
         }
         
         // Copy static properties from original
