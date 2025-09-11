@@ -202,6 +202,15 @@
         
         log.debug('🏢 Organizations data intercepted', { count: data?.data?.length });
         
+        // Check if we need to replace placeholder organization
+        if (window.__needsOrgUpdate && data?.data?.length > 0) {
+          log.info('🔄 Replacing placeholder organization with real data');
+          window.__needsOrgUpdate = false;
+        }
+        
+        // Store the real organizations
+        window.__sitecoreOrganizations = data?.data || [];
+        
         // Dispatch both old and new event formats for compatibility
         this.dispatchSecureEvent('organizations', { data });
         window.dispatchEvent(new CustomEvent('sitecoreOrganizationsData', { detail: data }));
@@ -216,6 +225,15 @@
         
         log.debug('🏢 Organizations XHR data intercepted', { count: data?.data?.length });
         
+        // Check if we need to replace placeholder organization
+        if (window.__needsOrgUpdate && data?.data?.length > 0) {
+          log.info('🔄 Replacing placeholder organization with real data');
+          window.__needsOrgUpdate = false;
+        }
+        
+        // Store the real organizations
+        window.__sitecoreOrganizations = data?.data || [];
+        
         this.dispatchSecureEvent('organizations', { data });
         window.dispatchEvent(new CustomEvent('sitecoreOrganizationsData', { detail: data }));
       } catch (error) {
@@ -224,18 +242,19 @@
     }
     
     async processGraphQLResponse(url, options, response) {
-      log.debug('🔍 Checking if GraphQL request is for tenants...');
+      log.debug('🔍 Checking GraphQL request type...');
       
       const isTenantsRequest = this.isGraphQLTenantsRequest(options);
-      log.debug('📊 Tenants request check result:', { isTenantsRequest });
+      const isUserOrgDepsRequest = this.isGraphQLUserOrgDepsRequest(options);
       
-      if (!isTenantsRequest) {
-        log.debug('⏭️ Not a tenants request, skipping');
+      log.debug('📊 Request check results:', { isTenantsRequest, isUserOrgDepsRequest });
+      
+      if (!isTenantsRequest && !isUserOrgDepsRequest) {
+        log.debug('⏭️ Not a relevant GraphQL request, skipping');
         return;
       }
       
       try {
-        log.debug('🎯 Processing GraphQL tenants response...');
         const clonedResponse = response.clone();
         const data = await clonedResponse.json();
         
@@ -245,12 +264,32 @@
           dataType: typeof data
         });
         
-        log.info('🎉 GraphQL tenants data intercepted successfully!');
+        if (isUserOrgDepsRequest) {
+          log.debug('🎯 Processing GraphQL GetUserOrgDeps response...');
+          
+          // Process GetUserOrgDeps to ensure organization exists
+          this.processUserOrgDepsData(data);
+          
+          log.info('🎉 GraphQL GetUserOrgDeps data intercepted successfully!');
+          
+          // Dispatch event for GetUserOrgDeps
+          this.dispatchSecureEvent('userOrgDeps', { data });
+          window.dispatchEvent(new CustomEvent('sitecoreUserOrgDepsData', { detail: data }));
+        }
         
-        this.dispatchSecureEvent('tenants', { data });
-        window.dispatchEvent(new CustomEvent('sitecoreTenantsData', { detail: data }));
+        if (isTenantsRequest) {
+          log.debug('🎯 Processing GraphQL tenants response...');
+          
+          // Check if we need to create a placeholder organization
+          this.ensureOrganizationExists(data);
+          
+          log.info('🎉 GraphQL tenants data intercepted successfully!');
+          
+          this.dispatchSecureEvent('tenants', { data });
+          window.dispatchEvent(new CustomEvent('sitecoreTenantsData', { detail: data }));
+        }
         
-        log.debug('📤 Tenants events dispatched');
+        log.debug('📤 GraphQL events dispatched');
       } catch (error) {
         log.error('❌ Error processing GraphQL response', error);
       }
@@ -260,13 +299,14 @@
       log.debug('🔍 Processing XHR GraphQL response...');
       
       const isTenantsRequest = this.isGraphQLTenantsRequest({ body: requestData });
-      if (!isTenantsRequest) {
-        log.debug('⏭️ XHR request is not for tenants, skipping');
+      const isUserOrgDepsRequest = this.isGraphQLUserOrgDepsRequest({ body: requestData });
+      
+      if (!isTenantsRequest && !isUserOrgDepsRequest) {
+        log.debug('⏭️ XHR request is not relevant, skipping');
         return;
       }
       
       try {
-        log.debug('🎯 Processing XHR GraphQL tenants response...');
         const data = JSON.parse(xhr.responseText);
         
         log.debug('📦 XHR GraphQL response data received:', { 
@@ -275,42 +315,274 @@
           dataType: typeof data
         });
         
-        log.info('🎉 GraphQL XHR tenants data intercepted successfully!');
+        if (isUserOrgDepsRequest) {
+          log.debug('🎯 Processing XHR GraphQL GetUserOrgDeps response...');
+          
+          // Process GetUserOrgDeps to ensure organization exists
+          this.processUserOrgDepsData(data);
+          
+          log.info('🎉 GraphQL XHR GetUserOrgDeps data intercepted successfully!');
+          
+          // Dispatch event for GetUserOrgDeps
+          this.dispatchSecureEvent('userOrgDeps', { data });
+          window.dispatchEvent(new CustomEvent('sitecoreUserOrgDepsData', { detail: data }));
+        }
         
-        this.dispatchSecureEvent('tenants', { data });
-        window.dispatchEvent(new CustomEvent('sitecoreTenantsData', { detail: data }));
+        if (isTenantsRequest) {
+          log.debug('🎯 Processing XHR GraphQL tenants response...');
+          
+          // Check if we need to create a placeholder organization
+          this.ensureOrganizationExists(data);
+          
+          log.info('🎉 GraphQL XHR tenants data intercepted successfully!');
+          
+          this.dispatchSecureEvent('tenants', { data });
+          window.dispatchEvent(new CustomEvent('sitecoreTenantsData', { detail: data }));
+        }
         
-        log.debug('📤 XHR Tenants events dispatched');
+        log.debug('📤 XHR GraphQL events dispatched');
       } catch (error) {
         log.error('❌ Error processing GraphQL XHR response', error);
       }
     }
     
+    ensureOrganizationExists(tenantsData) {
+      try {
+        // Check if we have any existing organizations
+        const existingOrgs = window.__sitecoreOrganizations || [];
+        
+        if (existingOrgs.length === 0) {
+          log.info('🏢 No organizations found, extracting from tenants data and creating placeholder');
+          
+          // Extract organization ID from tenants data
+          let orgId = null;
+          let orgName = 'New Organization';
+          
+          // Try to extract organization info from the GraphQL response
+          if (tenantsData?.data?.user?.tenants?.length > 0) {
+            const firstTenant = tenantsData.data.user.tenants[0];
+            orgId = firstTenant.organizationId || firstTenant.orgId;
+            orgName = firstTenant.organizationName || firstTenant.orgName || orgName;
+            
+            log.debug('📊 Extracted org info from tenants:', { orgId, orgName });
+          }
+          
+          // If still no orgId, try to extract from different response structure
+          if (!orgId && tenantsData?.data?.GetTenants?.length > 0) {
+            const firstTenant = tenantsData.data.GetTenants[0];
+            orgId = firstTenant.organizationId || firstTenant.orgId;
+            orgName = firstTenant.organizationName || firstTenant.orgName || orgName;
+            
+            log.debug('📊 Extracted org info from GetTenants:', { orgId, orgName });
+          }
+          
+          // If still no orgId, try a more generic search through the data
+          if (!orgId) {
+            const searchForOrgId = (obj) => {
+              if (!obj || typeof obj !== 'object') return null;
+              
+              if (obj.organizationId) return obj.organizationId;
+              if (obj.orgId) return obj.orgId;
+              
+              for (const key in obj) {
+                if (typeof obj[key] === 'object') {
+                  const found = searchForOrgId(obj[key]);
+                  if (found) return found;
+                }
+              }
+              return null;
+            };
+            
+            orgId = searchForOrgId(tenantsData);
+            log.debug('📊 Deep search for org ID:', { orgId });
+          }
+          
+          // Use extracted ID or fallback to placeholder
+          const finalOrgId = orgId || ('placeholder-org-' + Date.now());
+          
+          // Create a placeholder organization with real linking values
+          const placeholderOrg = {
+            id: finalOrgId,
+            name: orgName,
+            displayName: orgName,
+            originalName: orgName.toLowerCase().replace(/\s+/g, '-'),
+            type: orgId ? 'standard' : 'placeholder',
+            region: 'us-east-1',
+            accountId: null,
+            mfaRequired: false,
+            url: orgId ? `https://portal.sitecorecloud.io/?organization=${finalOrgId}` : '#',
+            lastUpdated: new Date().toISOString(),
+            isPlaceholder: true
+          };
+          
+          log.info('🏢 Creating placeholder organization with ID:', finalOrgId);
+          
+          // Store the placeholder organization
+          window.__sitecoreOrganizations = [placeholderOrg];
+          
+          // Dispatch an event with the placeholder organization
+          const placeholderOrgData = {
+            data: [placeholderOrg]
+          };
+          
+          this.dispatchSecureEvent('organizations', { data: placeholderOrgData });
+          window.dispatchEvent(new CustomEvent('sitecoreOrganizationsData', { detail: placeholderOrgData }));
+          
+          log.debug('📤 Placeholder organization created and dispatched', placeholderOrg);
+          
+          // Mark that we need to update this when real org data arrives
+          window.__needsOrgUpdate = true;
+        }
+      } catch (error) {
+        log.error('❌ Error ensuring organization exists', error);
+      }
+    }
+    
+    processUserOrgDepsData(data) {
+      try {
+        log.debug('🔍 Processing GetUserOrgDeps data for organization info...');
+        
+        // Check if we have any existing organizations
+        const existingOrgs = window.__sitecoreOrganizations || [];
+        
+        if (existingOrgs.length === 0) {
+          log.info('🏢 No organizations found, extracting from GetUserOrgDeps data');
+          
+          // Extract organization info from GetUserOrgDeps response
+          let orgId = null;
+          let orgName = 'New Organization';
+          let orgData = null;
+          
+          // Try to extract organization from GetUserOrgDeps response structure
+          if (data?.data?.GetUserOrgDeps?.org) {
+            const org = data.data.GetUserOrgDeps.org;
+            orgId = org.id || org.orgId;
+            orgName = org.name || org.displayName || orgName;
+            orgData = org;
+            
+            log.debug('📊 Extracted org from GetUserOrgDeps.org:', { orgId, orgName });
+          }
+          
+          // Try alternative structure: data.data.organization
+          if (!orgId && data?.data?.organization) {
+            const org = data.data.organization;
+            orgId = org.id || org.orgId;
+            orgName = org.name || org.displayName || orgName;
+            orgData = org;
+            
+            log.debug('📊 Extracted org from data.organization:', { orgId, orgName });
+          }
+          
+          // Try to find organization in user data
+          if (!orgId && data?.data?.GetUserOrgDeps?.user?.organization) {
+            const org = data.data.GetUserOrgDeps.user.organization;
+            orgId = org.id || org.orgId;
+            orgName = org.name || org.displayName || orgName;
+            orgData = org;
+            
+            log.debug('📊 Extracted org from user.organization:', { orgId, orgName });
+          }
+          
+          if (orgId) {
+            // Create organization from GetUserOrgDeps data
+            const organization = {
+              id: orgId,
+              name: orgName,
+              displayName: orgData?.displayName || orgName,
+              originalName: orgData?.originalName || orgName.toLowerCase().replace(/\s+/g, '-'),
+              type: orgData?.type || 'standard',
+              region: orgData?.region || orgData?.defaultDeploymentRegion || 'us-east-1',
+              accountId: orgData?.accountId || null,
+              mfaRequired: orgData?.mfa?.required || false,
+              url: `https://portal.sitecorecloud.io/?organization=${orgId}`,
+              lastUpdated: new Date().toISOString(),
+              fromUserOrgDeps: true
+            };
+            
+            log.info('🏢 Creating organization from GetUserOrgDeps with ID:', orgId);
+            
+            // Store the organization
+            window.__sitecoreOrganizations = [organization];
+            
+            // Dispatch organization event
+            const orgEventData = {
+              data: [organization]
+            };
+            
+            this.dispatchSecureEvent('organizations', { data: orgEventData });
+            window.dispatchEvent(new CustomEvent('sitecoreOrganizationsData', { detail: orgEventData }));
+            
+            log.debug('📤 Organization from GetUserOrgDeps created and dispatched', organization);
+            
+            // Mark that we may still need to update with full org data
+            window.__needsOrgUpdate = true;
+          } else {
+            log.debug('⚠️ Could not extract organization ID from GetUserOrgDeps data');
+          }
+        } else {
+          log.debug('✅ Organizations already exist, skipping GetUserOrgDeps org creation');
+        }
+      } catch (error) {
+        log.error('❌ Error processing GetUserOrgDeps data', error);
+      }
+    }
+    
+    isGraphQLUserOrgDepsRequest(options) {
+      // Check URL parameters first (most reliable)
+      const url = options?.url || '';
+      if (url.includes('GetUserOrgDeps')) {
+        log.debug('✅ GetUserOrgDeps detected in URL');
+        return true;
+      }
+      
+      // Check request body as fallback
+      if (options?.body) {
+        const bodyContent = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+        
+        // Check for GetUserOrgDeps operation name in the query
+        if (bodyContent.includes('"operationName":"GetUserOrgDeps"') || 
+            bodyContent.includes("'operationName':'GetUserOrgDeps'") ||
+            bodyContent.includes('query GetUserOrgDeps')) {
+          log.debug('✅ GetUserOrgDeps request detected in body!');
+          return true;
+        }
+      }
+      
+      return false;
+    }
+    
     isGraphQLTenantsRequest(options) {
+      // Check URL parameters first (most reliable)
+      const url = options?.url || '';
+      if (url.includes('GetTenants')) {
+        log.debug('✅ GetTenants detected in URL');
+        return true;
+      }
+      
       if (!options?.body) {
         log.debug('❌ No request body found');
         return false;
       }
       
       const bodyContent = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
-      log.debug('🔍 Checking request body for tenant keywords:', {
-        bodyLength: bodyContent.length,
-        bodyPreview: bodyContent.substring(0, 100)
+      
+      // Check for GetTenants operation name specifically
+      const hasGetTenantsOperation = bodyContent.includes('"operationName":"GetTenants"') || 
+                                     bodyContent.includes("'operationName':'GetTenants'") ||
+                                     bodyContent.includes('query GetTenants');
+      
+      // Check for user.applications query pattern (common in GetTenants)
+      const hasUserApplicationsQuery = bodyContent.includes('user') && 
+                                       bodyContent.includes('applications') && 
+                                       (bodyContent.includes('nodes') || bodyContent.includes('edges'));
+      
+      log.debug('🔍 Tenant detection results:', {
+        hasGetTenantsOperation,
+        hasUserApplicationsQuery,
+        bodyPreview: bodyContent.substring(0, 150)
       });
       
-      const hasGetTenants = bodyContent.includes('GetTenants');
-      const hasApplications = bodyContent.includes('applications');
-      const hasUser = bodyContent.includes('user');
-      const hasTenants = bodyContent.includes('tenants');
-      
-      log.debug('🔍 Keyword search results:', {
-        hasGetTenants,
-        hasApplications,
-        hasUser,
-        hasTenants
-      });
-      
-      const isTenantsRequest = hasGetTenants || hasApplications || hasUser || hasTenants;
+      const isTenantsRequest = hasGetTenantsOperation || hasUserApplicationsQuery;
       
       if (isTenantsRequest) {
         log.debug('✅ Tenant request detected!');
@@ -387,89 +659,130 @@
         const self = this;
         const originalXHR = window.XMLHttpRequest;
         
-        // Create a wrapper constructor using prototype override
-        function SecureXMLHttpRequest() {
-          const xhr = new originalXHR();
-          const self_ref = self;
-          
-          // Store original methods
-          const originalOpen = originalXHR.prototype.open;
-          const originalSend = originalXHR.prototype.send;
-          
-          // Create wrapper object with custom methods
-          const wrapper = Object.create(xhr);
-          
-          // Copy all properties from xhr to wrapper
-          for (let prop in xhr) {
-            try {
-              wrapper[prop] = xhr[prop];
-            } catch (e) {
-              // Skip read-only properties
-            }
-          }
-          
-          // Override open method on wrapper
-          wrapper.open = function(method, url, ...args) {
-            this._secureInterceptor = {
-              method,
-              url,
-              shouldIntercept: self_ref.shouldInterceptUrl(url),
-              id: self_ref.interceptorId
+        // Store original methods
+        const originalOpen = originalXHR.prototype.open;
+        const originalSend = originalXHR.prototype.send;
+        
+        // Try to override prototype methods first (works in some browsers)
+        try {
+          const descriptor = Object.getOwnPropertyDescriptor(originalXHR.prototype, 'open');
+          if (!descriptor || descriptor.configurable !== false) {
+            // Can modify prototype - use direct override
+            originalXHR.prototype.open = function(method, url, ...args) {
+              this._secureInterceptor = {
+                method,
+                url,
+                shouldIntercept: self.shouldInterceptUrl(url),
+                id: self.interceptorId
+              };
+              
+              if (this._secureInterceptor.shouldIntercept) {
+                log.debug('🔒 Secure XHR open interception (prototype override)', { method, url });
+              }
+              
+              return originalOpen.apply(this, [method, url, ...args]);
             };
             
-            if (this._secureInterceptor.shouldIntercept) {
-              log.debug('🔒 Secure XHR open interception (constructor wrapper)', { method, url });
-            }
-            
-            return originalOpen.apply(xhr, [method, url, ...args]);
-          };
-          
-          // Override send method on wrapper
-          wrapper.send = function(data) {
-            if (this._secureInterceptor?.shouldIntercept && this._secureInterceptor.id === self_ref.interceptorId) {
-              const originalOnReadyStateChange = xhr.onreadystatechange;
+            originalXHR.prototype.send = function(data) {
+              const xhr = this;
               
-              xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                  try {
-                    if (wrapper._secureInterceptor.url.includes('identity.sitecorecloud.io/api/identity/v1/user/organizations')) {
-                      self_ref.processOrganizationsXHRResponse(xhr);
-                    } else if (wrapper._secureInterceptor.url.includes('/api/portal/graphql') || wrapper._secureInterceptor.url.includes('graphql')) {
-                      self_ref.processGraphQLXHRResponse(xhr, data);
-                    }
-                  } catch (error) {
-                    log.error('🔒 Secure XHR response processing error', error);
-                  }
-                }
+              if (xhr._secureInterceptor?.shouldIntercept && xhr._secureInterceptor.id === self.interceptorId) {
+                const originalOnReadyStateChange = xhr.onreadystatechange;
                 
-                if (originalOnReadyStateChange) {
-                  originalOnReadyStateChange.apply(this, arguments);
-                }
-              };
-            }
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState === 4 && xhr.status === 200) {
+                    try {
+                      if (xhr._secureInterceptor.url.includes('identity.sitecorecloud.io/api/identity/v1/user/organizations')) {
+                        self.processOrganizationsXHRResponse(xhr);
+                      } else if (xhr._secureInterceptor.url.includes('/api/portal/graphql') || xhr._secureInterceptor.url.includes('graphql')) {
+                        self.processGraphQLXHRResponse(xhr, data);
+                      }
+                    } catch (error) {
+                      log.error('🔒 Secure XHR response processing error', error);
+                    }
+                  }
+                  
+                  if (originalOnReadyStateChange) {
+                    originalOnReadyStateChange.apply(this, arguments);
+                  }
+                };
+              }
+              
+              return originalSend.apply(this, [data]);
+            };
             
-            return originalSend.apply(xhr, [data]);
-          };
+            // No need for wrapper constructor, just use the modified prototype
+            window.XMLHttpRequest = originalXHR;
+            log.info('✅ Secure XHR constructor wrapper installed (prototype override)');
+            return;
+          }
+        } catch (e) {
+          // Prototype override failed, fall back to constructor replacement
+          log.debug('Prototype override failed, using constructor replacement', e);
+        }
+        
+        // Fallback: Replace constructor with wrapper
+        function SecureXMLHttpRequest(...args) {
+          const xhr = new originalXHR(...args);
           
-          // Proxy property access to the underlying xhr
-          Object.defineProperty(wrapper, 'responseText', {
-            get: function() { return xhr.responseText; }
-          });
-          Object.defineProperty(wrapper, 'response', {
-            get: function() { return xhr.response; }
-          });
-          Object.defineProperty(wrapper, 'status', {
-            get: function() { return xhr.status; }
-          });
-          Object.defineProperty(wrapper, 'readyState', {
-            get: function() { return xhr.readyState; }
-          });
-          Object.defineProperty(wrapper, 'onreadystatechange', {
-            get: function() { return xhr.onreadystatechange; },
-            set: function(val) { xhr.onreadystatechange = val; }
+          // Store original methods bound to this instance
+          const boundOpen = originalOpen.bind(xhr);
+          const boundSend = originalSend.bind(xhr);
+          
+          // Define custom open method using defineProperty
+          Object.defineProperty(xhr, 'open', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function(method, url, ...openArgs) {
+              xhr._secureInterceptor = {
+                method,
+                url,
+                shouldIntercept: self.shouldInterceptUrl(url),
+                id: self.interceptorId
+              };
+              
+              if (xhr._secureInterceptor.shouldIntercept) {
+                log.debug('🔒 Secure XHR open interception (instance wrapper)', { method, url });
+              }
+              
+              return boundOpen(method, url, ...openArgs);
+            }
           });
           
-          return wrapper;
+          // Define custom send method using defineProperty
+          Object.defineProperty(xhr, 'send', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function(data) {
+              if (xhr._secureInterceptor?.shouldIntercept && xhr._secureInterceptor.id === self.interceptorId) {
+                const originalOnReadyStateChange = xhr.onreadystatechange;
+                
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState === 4 && xhr.status === 200) {
+                    try {
+                      if (xhr._secureInterceptor.url.includes('identity.sitecorecloud.io/api/identity/v1/user/organizations')) {
+                        self.processOrganizationsXHRResponse(xhr);
+                      } else if (xhr._secureInterceptor.url.includes('/api/portal/graphql') || xhr._secureInterceptor.url.includes('graphql')) {
+                        self.processGraphQLXHRResponse(xhr, data);
+                      }
+                    } catch (error) {
+                      log.error('🔒 Secure XHR response processing error', error);
+                    }
+                  }
+                  
+                  if (originalOnReadyStateChange) {
+                    originalOnReadyStateChange.apply(this, arguments);
+                  }
+                };
+              }
+              
+              return boundSend(data);
+            }
+          });
+          
+          return xhr;
         }
         
         // Copy static properties from original

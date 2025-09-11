@@ -19,13 +19,14 @@ class OrganizationManager {
    * Set up cleanup handlers
    */
   setupCleanup() {
-    // Handle popup close
+    // Handle popup close - using pagehide instead of deprecated unload
     if (typeof memoryManager !== 'undefined') {
       memoryManager.addEventListener(window, 'beforeunload', () => {
         this.cleanup();
       });
       
-      memoryManager.addEventListener(window, 'unload', () => {
+      // Use pagehide instead of deprecated unload event
+      memoryManager.addEventListener(window, 'pagehide', () => {
         this.cleanup();
       });
     } else {
@@ -33,7 +34,8 @@ class OrganizationManager {
         this.cleanup();
       });
       
-      window.addEventListener('unload', () => {
+      // Use pagehide instead of deprecated unload event
+      window.addEventListener('pagehide', () => {
         this.cleanup();
       });
     }

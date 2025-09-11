@@ -1,0 +1,90 @@
+{
+    "data": {
+        "organization": {
+            "id": "org_SampleOrgId123456",
+            "name": "sample-organisation",
+            "displayName": "Sample Organisation",
+            "accountId": "0000N00000ZzZzZZZZ",
+            "type": "CUSTOMER",
+            "__typename": "Organization"
+        },
+        "user": {
+            "applications": {
+                "nodes": [
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    },
+                    {
+                        "assignedRoles": {
+                            "nodes": [],
+                            "__typename": "AssignedRolesConnection"
+                        },
+                        "__typename": "ContextUserApplication"
+                    }
+                ],
+                "__typename": "ContextUserApplicationsConnection"
+            },
+            "__typename": "ContextUser"
+        }
+    }
+}
