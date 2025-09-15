@@ -12,6 +12,10 @@ class OrganizationManager {
     
     // Set up cleanup on window close
     this.setupCleanup();
+    
+    // Listen for user guidance events
+    this.setupUserGuidanceListener();
+    
     this.init();
   }
 
@@ -62,6 +66,72 @@ class OrganizationManager {
     }
     
     this.logger.debug('OrganizationManager cleanup completed');
+  }
+  
+  /**
+   * Set up listener for user guidance events from content script
+   */
+  setupUserGuidanceListener() {
+    const handleUserGuidance = (event) => {
+      const { message, url } = event.detail;
+      this.showUserGuidance(title, message, url);
+    };
+    
+    this.addTrackedEventListener(window, 'sitecore_user_guidance', handleUserGuidance);
+  }
+  
+  /**
+   * Display user guidance message to the user
+   * @param {string} message - The guidance message
+   * @param {string} url - The URL to navigate to
+   */
+  showUserGuidance(title, message, url) {
+    // Remove any existing guidance first to prevent duplicates
+    const existingGuidance = document.querySelector('.guidance-container');
+    if (existingGuidance) {
+      existingGuidance.remove();
+    }
+    
+    // Create new guidance container
+    const guidanceContainer = document.createElement('div');
+    guidanceContainer.className = 'guidance-container';
+    guidanceContainer.innerHTML = `
+      <div class="guidance-message">
+        <img src="/ui/icons/icon48.png" alt="Sitecore" class="guidance-icon">
+        <div class="guidance-title"></div>
+        <div class="guidance-text"></div>
+        <button class="guidance-button">Open Portal</button>
+      </div>
+    `;
+    
+    // Insert at the top of the popup
+    const container = document.querySelector('.container');
+    container.insertBefore(guidanceContainer, container.firstChild);
+    
+    // Update message
+    const titleElement = guidanceContainer.querySelector('.guidance-title');
+    titleElement.textContent = title;
+
+    // Update message
+    const textElement = guidanceContainer.querySelector('.guidance-text');
+    textElement.textContent = message;
+    
+    // Set up button handlers
+    const openButton = guidanceContainer.querySelector('.guidance-button');
+    
+    openButton.onclick = async () => {
+      try {
+        await chrome.tabs.create({ url });
+        guidanceContainer.remove();
+      } catch (error) {
+        this.logger.error('Error opening portal URL', error);
+      }
+    };
+    
+    // Show the guidance
+    guidanceContainer.style.display = 'block';
+    
+    this.logger.info('User guidance displayed:', message);
   }
   
   /**
@@ -687,11 +757,25 @@ class OrganizationManager {
     if (this.organizations.length === 0) {
       listElement.classList.add("hidden");
       emptyStateElement.classList.remove("hidden");
+      
+      // Show user guidance when no organizations are found
+      this.showUserGuidance(
+        'No organizations found.',
+        'Please visit Sitecore Portal and populate your organizations.',
+        'https://portal.sitecorecloud.io/'
+      );
+      
       return;
     }
 
     listElement.classList.remove("hidden");
     emptyStateElement.classList.add("hidden");
+    
+    // Remove any existing guidance messages when organizations are present
+    const existingGuidance = document.querySelector('.guidance-container');
+    if (existingGuidance) {
+      existingGuidance.remove();
+    }
 
     // Sort organizations alphabetically by name
     const sortedOrgs = [...this.organizations].sort((a, b) => 

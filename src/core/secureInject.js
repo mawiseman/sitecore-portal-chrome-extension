@@ -100,6 +100,23 @@
       }
     }
     
+    dispatchUserGuidance(message) {
+      try {
+        const event = new CustomEvent('sitecore_user_guidance', {
+          detail: {
+            message: message,
+            url: 'https://portal.sitecorecloud.io/',
+            timestamp: Date.now(),
+            interceptorId: this.interceptorId
+          }
+        });
+        window.dispatchEvent(event);
+        log.info(`📢 User guidance: ${message}`);
+      } catch (error) {
+        log.error('Error dispatching user guidance', error);
+      }
+    }
+    
     createSecureFetchInterceptor() {
       const originalFetch = this.originalMethods.fetch;
       const self = this;
@@ -354,6 +371,9 @@
         if (existingOrgs.length === 0) {
           log.info('🏢 No organizations found, extracting from tenants data and creating placeholder');
           
+          // Dispatch user guidance event to notify popup
+          this.dispatchUserGuidance('No organizations found. Please visit https://portal.sitecorecloud.io/ to access your Sitecore Portal and populate your organizations.');
+          
           // Extract organization ID from tenants data
           let orgId = null;
           let orgName = 'New Organization';
@@ -447,6 +467,9 @@
         
         if (existingOrgs.length === 0) {
           log.info('🏢 No organizations found, extracting from GetUserOrgDeps data');
+          
+          // Dispatch user guidance event
+          this.dispatchUserGuidance('No organizations found. Please visit https://portal.sitecorecloud.io/ to access your Sitecore Portal and populate your organizations.');
           
           // Extract organization info from GetUserOrgDeps response
           let orgId = null;
