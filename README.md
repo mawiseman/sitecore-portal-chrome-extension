@@ -169,12 +169,6 @@ Key configuration options in `config.js`:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👤 Author
-
-**Mark Wiseman**
-- Email: mark@wiseman.net.au
-- Website: https://wiseman.net.au
-
 ## 🆘 Support
 
 For issues, questions, or feature requests:
