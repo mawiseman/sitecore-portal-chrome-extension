@@ -103,13 +103,19 @@ body {
   padding: 0;
   margin-bottom: 12px;
   background: white;
-  border-radius: 12px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   border: none;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: visible;
+}
+
+/* Ensure edit mode doesn't cause overflow issues */
+.org-item:has(.editing) {
+  overflow: visible;
+  z-index: 5;
 }
 
 .org-item:hover {
@@ -426,6 +432,24 @@ img.subsite-icon {
   align-items: center;
 }
 
+/* Edit mode container positioning */
+.org-name.editing,
+.tenant-name-container.editing {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-height: 28px;
+}
+
+/* Hide other elements when editing to prevent overlap */
+.org-name.editing .subsite-count,
+.org-name.editing .current-label,
+.org-name.editing .delete-icon {
+  display: none !important;
+}
+
 .edit-icon {
   width: 14px;
   height: 14px;
@@ -472,20 +496,28 @@ img.subsite-icon {
 
 .name-edit-input {
   flex: 1;
-  padding: 2px 4px;
-  border: 1px solid #4285f4;
-  border-radius: 3px;
+  padding: 4px 6px;
+  border: 2px solid #4285f4;
+  border-radius: 4px;
   font-size: inherit;
   font-family: inherit;
   background: white;
   outline: none;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2);
+  min-width: 150px;
+  z-index: 11;
 }
 
 .edit-controls {
   display: flex;
   align-items: center;
-  margin-left: 6px;
-  gap: 2px;
+  margin-left: 8px;
+  gap: 4px;
+  background: white;
+  padding: 2px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 11;
 }
 
 .edit-btn {

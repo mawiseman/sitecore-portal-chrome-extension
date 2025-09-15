@@ -806,6 +806,9 @@ class OrganizationManager {
     
     if (!nameText) return;
     
+    // Add editing class to the container
+    element.classList.add('editing');
+    
     // Create input field
     const input = document.createElement('input');
     input.type = 'text';
@@ -942,6 +945,9 @@ class OrganizationManager {
     const controls = element.querySelector('.edit-controls');
     const nameText = element.querySelector('.name-text') || element.querySelector('.tenant-name');
     const editIcon = element.querySelector('.edit-icon');
+    
+    // Remove editing class from the container
+    element.classList.remove('editing');
     
     if (input) input.remove();
     if (controls) controls.remove();
