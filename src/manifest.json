@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sitecore Portal Quicklinks",
   "author": "mark@wiseman.net.au",
-  "version": "1.0",
+  "version": "1.1.0",
   "homepage_url": "https://wiseman.net.au",
   "description": "Generates quicklins to your Sitecore Portal organizations and tenants.",
   "permissions": ["storage", "activeTab", "webRequest", "alarms", "management"],
