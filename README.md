@@ -2,6 +2,8 @@
 
 A productivity Chrome extension that automatically detects and saves Sitecore Portal organizations and tenants, providing quick access through a convenient browser popup.
 
+![Sitecore Portal Quicklinks Chrome Extension](./docs/screenshot-small.png "Title")
+
 ## 🚀 Features
 
 - **Automatic Organization Detection**: Automatically captures organization information when visiting Sitecore Portal
