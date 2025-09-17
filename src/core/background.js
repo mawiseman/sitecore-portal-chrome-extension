@@ -233,27 +233,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-// Extension uninstall preparation (when possible)
-// Note: Chrome doesn't provide a direct uninstall event, but we can handle management events
-if (chrome.management && chrome.management.onUninstalled) {
-  chrome.management.onUninstalled.addListener(async (extensionInfo) => {
-    if (extensionInfo.id === chrome.runtime.id) {
-      logger.info('Extension being uninstalled - performing secure cleanup');
-      
-      try {
-        // Initialize storage security manager if available
-        if (typeof StorageSecurityManager !== 'undefined') {
-          const securityManager = new StorageSecurityManager();
-          await securityManager.secureDelete();
-          logger.info('Secure deletion completed on uninstall');
-        } else {
-          logger.warn('StorageSecurityManager not available for secure deletion');
-        }
-      } catch (error) {
-        logger.error('Failed to perform secure deletion on uninstall', error);
-      }
-    }
-  });
-}
+// Extension uninstall preparation removed - periodic cleanup via alarms handles data expiration
 
 logger.info('Background script: WebRequest listeners registered');

@@ -5,7 +5,7 @@
   "version": "1.1.0",
   "homepage_url": "https://wiseman.net.au",
   "description": "Generates quicklins to your Sitecore Portal organizations and tenants.",
-  "permissions": ["storage", "activeTab", "webRequest", "alarms", "management"],
+  "permissions": ["storage", "webRequest", "alarms"],
   "host_permissions": [
     "https://portal.sitecorecloud.io/*",
     "https://identity.sitecorecloud.io/*"
