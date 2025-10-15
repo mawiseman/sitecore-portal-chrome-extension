@@ -82,12 +82,16 @@ class SecurityUtils {
   };
 
   /**
-   * Validates and sanitizes organization data
+   * Validates and sanitizes organization data from API (auto-added)
+   * Uses cleansing instead of strict validation for names
    * @param {Object} org - Organization object to validate
+   * @param {Object} options - Validation options
    * @returns {Object} Sanitized organization object
    * @throws {Error} If validation fails
    */
-  static validateOrganizationData(org) {
+  static validateOrganizationData(org, options = {}) {
+    const { autoAdded = true } = options;
+
     if (!org || typeof org !== 'object') {
       throw new Error('Invalid organization data: must be an object');
     }
@@ -105,17 +109,28 @@ class SecurityUtils {
       sanitized.id = this.sanitizeString(org.id);
     }
 
-    // Validate and sanitize name
+    // Validate and sanitize name - use cleansing for auto-added orgs
     if (org.name) {
-      sanitized.name = this.validateAndSanitizeName(org.name, 'Organization name');
+      if (autoAdded) {
+        sanitized.name = this.cleanseName(org.name, this.MAX_LENGTHS.ORGANIZATION_NAME);
+        if (!sanitized.name) {
+          throw new Error('Organization name is empty after cleansing');
+        }
+      } else {
+        sanitized.name = this.validateAndSanitizeName(org.name, 'Organization name');
+      }
     }
 
     // Validate and sanitize display name
     if (org.displayName) {
-      sanitized.displayName = this.validateAndSanitizeName(org.displayName, 'Display name');
+      if (autoAdded) {
+        sanitized.displayName = this.cleanseName(org.displayName, this.MAX_LENGTHS.DISPLAY_NAME);
+      } else {
+        sanitized.displayName = this.validateAndSanitizeName(org.displayName, 'Display name');
+      }
     }
 
-    // Validate and sanitize custom name
+    // Validate and sanitize custom name (always strict - user entered)
     if (org.customName) {
       sanitized.customName = this.validateAndSanitizeName(org.customName, 'Custom name');
     }
@@ -141,15 +156,15 @@ class SecurityUtils {
 
     // Recursively validate product groups
     if (org.productGroups && Array.isArray(org.productGroups)) {
-      sanitized.productGroups = org.productGroups.map(group => 
-        this.validateProductGroup(group)
+      sanitized.productGroups = org.productGroups.map(group =>
+        this.validateProductGroup(group, { autoAdded })
       );
     }
 
     // Recursively validate subsites (legacy)
     if (org.subsites && Array.isArray(org.subsites)) {
-      sanitized.subsites = org.subsites.map(subsite => 
-        this.validateSubsiteData(subsite)
+      sanitized.subsites = org.subsites.map(subsite =>
+        this.validateSubsiteData(subsite, { autoAdded })
       );
     }
 
@@ -159,22 +174,27 @@ class SecurityUtils {
   /**
    * Validates and sanitizes product group data
    * @param {Object} group - Product group to validate
+   * @param {Object} options - Validation options
    * @returns {Object} Sanitized product group
    */
-  static validateProductGroup(group) {
+  static validateProductGroup(group, options = {}) {
+    const { autoAdded = true } = options;
+
     if (!group || typeof group !== 'object') {
       throw new Error('Invalid product group data');
     }
 
     const sanitized = {
-      productName: this.validateAndSanitizeName(group.productName || '', 'Product name'),
+      productName: autoAdded
+        ? this.cleanseName(group.productName || '', this.MAX_LENGTHS.DISPLAY_NAME)
+        : this.validateAndSanitizeName(group.productName || '', 'Product name'),
       iconSrc: group.iconSrc ? this.validateAndSanitizeUrl(group.iconSrc) : '',
       tenants: []
     };
 
     if (group.tenants && Array.isArray(group.tenants)) {
-      sanitized.tenants = group.tenants.map(tenant => 
-        this.validateTenantData(tenant)
+      sanitized.tenants = group.tenants.map(tenant =>
+        this.validateTenantData(tenant, { autoAdded })
       );
     }
 
@@ -184,9 +204,12 @@ class SecurityUtils {
   /**
    * Validates and sanitizes tenant data
    * @param {Object} tenant - Tenant object to validate
+   * @param {Object} options - Validation options
    * @returns {Object} Sanitized tenant object
    */
-  static validateTenantData(tenant) {
+  static validateTenantData(tenant, options = {}) {
+    const { autoAdded = true } = options;
+
     if (!tenant || typeof tenant !== 'object') {
       throw new Error('Invalid tenant data');
     }
@@ -201,13 +224,22 @@ class SecurityUtils {
       sanitized.id = tenant.id;
     }
 
-    // Validate and sanitize names
+    // Validate and sanitize names - use cleansing for auto-added tenants
     if (tenant.name) {
-      sanitized.name = this.validateAndSanitizeName(tenant.name, 'Tenant name');
+      if (autoAdded) {
+        sanitized.name = this.cleanseName(tenant.name, this.MAX_LENGTHS.DISPLAY_NAME);
+      } else {
+        sanitized.name = this.validateAndSanitizeName(tenant.name, 'Tenant name');
+      }
     }
     if (tenant.displayName) {
-      sanitized.displayName = this.validateAndSanitizeName(tenant.displayName, 'Tenant display name');
+      if (autoAdded) {
+        sanitized.displayName = this.cleanseName(tenant.displayName, this.MAX_LENGTHS.DISPLAY_NAME);
+      } else {
+        sanitized.displayName = this.validateAndSanitizeName(tenant.displayName, 'Tenant display name');
+      }
     }
+    // Custom name is always user-entered, so always use strict validation
     if (tenant.customName) {
       sanitized.customName = this.validateAndSanitizeName(tenant.customName, 'Tenant custom name');
     }
@@ -235,7 +267,7 @@ class SecurityUtils {
 
     // Validate actions
     if (tenant.actions && Array.isArray(tenant.actions)) {
-      sanitized.actions = tenant.actions.map(action => this.validateActionData(action));
+      sanitized.actions = tenant.actions.map(action => this.validateActionData(action, { autoAdded }));
     }
 
     return sanitized;
@@ -244,17 +276,24 @@ class SecurityUtils {
   /**
    * Validates and sanitizes subsite data (legacy format)
    * @param {Object} subsite - Subsite object to validate
+   * @param {Object} options - Validation options
    * @returns {Object} Sanitized subsite object
    */
-  static validateSubsiteData(subsite) {
+  static validateSubsiteData(subsite, options = {}) {
+    const { autoAdded = true } = options;
+
     if (!subsite || typeof subsite !== 'object') {
       throw new Error('Invalid subsite data');
     }
 
     return {
       id: this.sanitizeString(subsite.id || ''),
-      name: this.validateAndSanitizeName(subsite.name || '', 'Subsite name'),
-      displayName: this.validateAndSanitizeName(subsite.displayName || '', 'Subsite display name'),
+      name: autoAdded
+        ? this.cleanseName(subsite.name || '', this.MAX_LENGTHS.DISPLAY_NAME)
+        : this.validateAndSanitizeName(subsite.name || '', 'Subsite name'),
+      displayName: autoAdded
+        ? this.cleanseName(subsite.displayName || '', this.MAX_LENGTHS.DISPLAY_NAME)
+        : this.validateAndSanitizeName(subsite.displayName || '', 'Subsite display name'),
       url: subsite.url ? this.validateAndSanitizeUrl(subsite.url) : '',
       customName: subsite.customName ? this.validateAndSanitizeName(subsite.customName, 'Subsite custom name') : undefined
     };
@@ -263,16 +302,25 @@ class SecurityUtils {
   /**
    * Validates and sanitizes action data
    * @param {Object} action - Action object to validate
+   * @param {Object} options - Validation options
    * @returns {Object} Sanitized action object
    */
-  static validateActionData(action) {
+  static validateActionData(action, options = {}) {
+    const { autoAdded = true } = options;
+
     if (!action || typeof action !== 'object') {
       throw new Error('Invalid action data');
     }
 
     const sanitized = {
-      name: this.validateAndSanitizeName(action.name || '', 'Action name', this.MAX_LENGTHS.ACTION_NAME),
-      displayName: action.displayName ? this.validateAndSanitizeName(action.displayName, 'Action display name', this.MAX_LENGTHS.ACTION_NAME) : null,
+      name: autoAdded
+        ? this.cleanseName(action.name || '', this.MAX_LENGTHS.ACTION_NAME)
+        : this.validateAndSanitizeName(action.name || '', 'Action name', this.MAX_LENGTHS.ACTION_NAME),
+      displayName: action.displayName
+        ? (autoAdded
+          ? this.cleanseName(action.displayName, this.MAX_LENGTHS.ACTION_NAME)
+          : this.validateAndSanitizeName(action.displayName, 'Action display name', this.MAX_LENGTHS.ACTION_NAME))
+        : null,
       category: this.sanitizeString(action.category || ''),
       description: this.sanitizeString(action.description || '').substring(0, this.MAX_LENGTHS.DESCRIPTION)
     };
@@ -290,8 +338,47 @@ class SecurityUtils {
         sanitized.url = null;
       }
     }
-    
+
     return sanitized;
+  }
+
+  /**
+   * Cleanses a name by removing or replacing invalid characters
+   * Used for automatically added names from API responses
+   * @param {string} name - Name to cleanse
+   * @param {number} maxLength - Maximum allowed length
+   * @returns {string} Cleansed name
+   */
+  static cleanseName(name, maxLength = this.MAX_LENGTHS.DISPLAY_NAME) {
+    if (typeof name !== 'string') {
+      return '';
+    }
+
+    let cleansed = name.trim();
+
+    if (cleansed.length === 0) {
+      return '';
+    }
+
+    // Replace smart quotes with regular quotes
+    cleansed = cleansed
+      .replace(/[\u2018\u2019]/g, "'")  // Single smart quotes
+      .replace(/[\u201C\u201D]/g, '"')  // Double smart quotes
+      .replace(/[\u2013\u2014]/g, '-'); // Em/en dashes
+
+    // Remove any characters that don't match the safe pattern
+    // Keep: letters, numbers, spaces, hyphens, underscores, periods, commas, parentheses, ampersands, apostrophes, forward slashes
+    cleansed = cleansed.replace(/[^a-zA-Z0-9\s\-_.,()&'/]/g, '');
+
+    // Collapse multiple spaces into single space
+    cleansed = cleansed.replace(/\s+/g, ' ').trim();
+
+    // Truncate if too long
+    if (cleansed.length > maxLength) {
+      cleansed = cleansed.substring(0, maxLength).trim();
+    }
+
+    return this.sanitizeString(cleansed);
   }
 
   /**
@@ -307,11 +394,11 @@ class SecurityUtils {
     }
 
     const trimmed = name.trim();
-    
+
     if (trimmed.length === 0) {
       throw new Error(`${fieldName} cannot be empty`);
     }
-    
+
     if (trimmed.length > maxLength) {
       throw new Error(`${fieldName} too long (max ${maxLength} characters)`);
     }
