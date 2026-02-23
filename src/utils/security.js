@@ -25,6 +25,7 @@ class SecurityUtils {
     /^https:\/\/([a-zA-Z0-9\-]+\.)*stylelabs\.io($|\/.*$|\?.*$)$/,
     /^https:\/\/([a-zA-Z0-9\-]+\.)*sitecore\.com($|\/.*$|\?.*$)$/,
     /^https:\/\/([a-zA-Z0-9\-]+\.)*ordercloud\.io($|\/.*$|\?.*$)$/,
+    /^https:\/\/([a-zA-Z0-9\-]+\.)*workato\.com($|\/.*$|\?.*$)$/,
     /^https:\/\/npmjs\.com($|\/.*$|\?.*$)$/,
     /^https:\/\/www\.npmjs\.com($|\/.*$|\?.*$)$/
   ];
@@ -452,7 +453,8 @@ class SecurityUtils {
     'doc.sitecore.com',
     'developers.sitecore.com',
     'github.com',
-    'docs.microsoft.com'
+    'docs.microsoft.com',
+    'workato.com'
   ];
 
   /**

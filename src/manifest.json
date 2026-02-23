@@ -8,7 +8,8 @@
   "permissions": ["storage", "webRequest", "alarms"],
   "host_permissions": [
     "https://portal.sitecorecloud.io/*",
-    "https://identity.sitecorecloud.io/*"
+    "https://identity.sitecorecloud.io/*",
+    "https://xmapps.sitecorecloud.io/*"
   ],
   "background": {
     "service_worker": "core/background.js"
@@ -26,7 +27,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://portal.sitecorecloud.io/*"],
+      "matches": [
+        "https://portal.sitecorecloud.io/*",
+        "https://xmapps.sitecorecloud.io/*"
+      ],
       "js": [
         "config/config.js", 
         "utils/logger.js", 
@@ -47,7 +51,10 @@
   "web_accessible_resources": [
     {
       "resources": ["ui/icons/*.svg", "core/secureInject.js", "managers/memoryManager.js"],
-      "matches": ["https://portal.sitecorecloud.io/*"]
+      "matches": [
+        "https://portal.sitecorecloud.io/*",
+        "https://xmapps.sitecorecloud.io/*"
+      ]
     }
   ],
   "icons": {
