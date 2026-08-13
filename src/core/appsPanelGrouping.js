@@ -9,8 +9,6 @@ class AppsPanelGrouper {
   static STYLE_ID = 'qtl-grouped-style';
   static SOURCE_ATTR = 'data-qtl-source';
 
-  static PRODUCT_ORDER = ['SitecoreAI', 'Search', 'Personalize', 'CDP', 'OrderCloud', 'Connect', 'Stream'];
-
   static BADGE_STYLES = {
     prod: { color: '#a8392f', background: '#f6e3e0', label: 'Prod' },
     trial: { color: '#8a6a15', background: '#f2e9d3', label: 'Trial' },
@@ -212,11 +210,6 @@ class AppsPanelGrouper {
     return tile.querySelector('p')?.textContent?.trim() || 'Unknown';
   }
 
-  productRank(label) {
-    const idx = AppsPanelGrouper.PRODUCT_ORDER.findIndex((p) => p.toLowerCase() === label.toLowerCase());
-    return idx === -1 ? AppsPanelGrouper.PRODUCT_ORDER.length : idx;
-  }
-
   // Prod is read from the badge (set from the real environment tag); UAT/QA
   // aren't tagged by Sitecore at all, so they're detected from the org
   // qualifier text itself (e.g. "Bridgestone / QA", "Bridgestone / UAT").
@@ -250,7 +243,7 @@ class AppsPanelGrouper {
 
     // Stable sort across groups per the fixed product order; anything not in
     // that list falls to the end, keeping its original relative order.
-    return Array.from(groups.values()).sort((a, b) => this.productRank(a.label) - this.productRank(b.label));
+    return Array.from(groups.values()).sort((a, b) => CONFIG.getProductRank(a.label) - CONFIG.getProductRank(b.label));
   }
 
   buildGroupedUI(groups) {

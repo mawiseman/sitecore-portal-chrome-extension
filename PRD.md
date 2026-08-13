@@ -126,6 +126,7 @@ Tenant {
   customName?: string,  // User-defined custom name
   url: string,          // Tenant URL
   organizationId: string, // Parent organization ID
+  environmentType?: 'prod' | 'nonprod', // From the node's CustomerEnvironmentType label
   actions: Action[]     // Available tenant actions
 }
 

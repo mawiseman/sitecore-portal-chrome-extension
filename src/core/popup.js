@@ -6,7 +6,6 @@
 class OrganizationManager {
   constructor() {
     this.organizations = [];
-    this.currentUrl = "";
     this.logger = Logger.createContextLogger('OrganizationManager');
     this.eventCleanupCallbacks = [];
     
@@ -157,7 +156,6 @@ class OrganizationManager {
   async init() {
     try {
       await this.loadOrganizations();
-      await this.getCurrentUrl();
       this.renderOrganizations();
     } catch (error) {
       this.logger.error("Initialization failed", error);
@@ -182,29 +180,6 @@ class OrganizationManager {
         return true;
       });
       if (!recovered) throw error;
-    }
-  }
-
-  /**
-   * Gets the URL of the current active tab with timeout
-   * @returns {Promise<void>}
-   */
-  async getCurrentUrl() {
-    try {
-      const [tab] = await this.withTimeout(
-        chrome.tabs.query({ active: true, currentWindow: true }),
-        CONFIG.get('TIMEOUTS.CHROME_API') || 5000,
-        'getCurrentUrl'
-      );
-      this.currentUrl = tab?.url || "";
-    } catch (error) {
-      const recovered = await errorHandler.handleError(error, 'get_current_url', {}, async () => {
-        this.currentUrl = "";
-        return true;
-      });
-      if (!recovered) {
-        this.currentUrl = "";
-      }
     }
   }
 
@@ -329,26 +304,56 @@ class OrganizationManager {
   }
 
   /**
-   * Helper function to get total subsite/tenant count
-   * @param {Object} org - Organization object
-   * @returns {number} Total count of tenants/subsites
+   * Orders product groups per CONFIG.UI.PRODUCT_ORDER, matching the same
+   * fixed ordering used by the live-page grouping content script. Products
+   * not in that list fall to the end, keeping their original relative order.
+   * @param {Object[]} productGroups - Product groups to order
+   * @returns {Object[]} A new, ordered array (input is not mutated)
    */
-  getTotalCount(org) {
-    if (org.productGroups && org.productGroups.length > 0) {
-      return org.productGroups.reduce((sum, group) => sum + group.tenants.filter(t => t.url).length, 0);
-    } else if (org.subsites && org.subsites.length > 0) {
-      return org.subsites.length;
+  sortProductGroups(productGroups) {
+    return [...productGroups].sort((a, b) =>
+      CONFIG.getProductRank(a.productName) - CONFIG.getProductRank(b.productName)
+    );
+  }
+
+  /**
+   * Classifies a tenant's environment for badge display and sort order.
+   * Prefers the real `environmentType` captured from Sitecore's own data;
+   * falls back to a best-effort guess from the display text for tenants
+   * captured before that field existed.
+   * @param {Object} tenant - Tenant object
+   * @returns {{badge: ('prod'|'nonprod'|undefined), rank: number}}
+   */
+  getEnvironmentInfo(tenant) {
+    const text = tenant.customName || tenant.displayName || tenant.name || '';
+    let badge = tenant.environmentType;
+
+    if (!badge) {
+      if (/\bprod(uction)?\b/i.test(text)) {
+        badge = 'prod';
+      } else if (/\b(uat|qa|dev|sandbox|test|trial)\b/i.test(text)) {
+        badge = 'nonprod';
+      }
     }
-    return 0;
+
+    let rank = 3;
+    if (badge === 'prod') {
+      rank = 0;
+    } else if (/\buat\b/i.test(text)) {
+      rank = 1;
+    } else if (/\bqa\b/i.test(text)) {
+      rank = 2;
+    }
+
+    return { badge, rank };
   }
 
   /**
    * Creates a DOM element for an organization item
    * @param {Object} org - Organization object
-   * @param {boolean} isCurrent - Whether this is the current organization
    * @returns {HTMLElement} Organization list item element
    */
-  createOrganizationElement(org, isCurrent) {
+  createOrganizationElement(org) {
     // Create list item
     const li = document.createElement('li');
     li.className = 'org-item';
@@ -367,7 +372,7 @@ class OrganizationManager {
       const expandSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       expandSvg.setAttribute('class', 'expand-icon');
       expandSvg.setAttribute('viewBox', '0 0 24 24');
-      
+
       const expandPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       expandPath.setAttribute('d', 'M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z');
       expandSvg.appendChild(expandPath);
@@ -383,7 +388,7 @@ class OrganizationManager {
     const iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     iconSvg.setAttribute('class', 'org-icon');
     iconSvg.setAttribute('viewBox', '0 0 24 24');
-    
+
     const iconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     iconPath.setAttribute('d', 'M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z');
     iconSvg.appendChild(iconPath);
@@ -403,7 +408,18 @@ class OrganizationManager {
     nameSpan.textContent = displayName;
     nameSpan.title = displayName; // Add tooltip for full name
     nameDiv.appendChild(nameSpan);
-    
+
+    // Add open-link icon (navigates to the organization - the row itself now toggles expand)
+    const openLinkIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    openLinkIcon.setAttribute('class', 'open-link-icon');
+    openLinkIcon.setAttribute('viewBox', '0 0 24 24');
+    openLinkIcon.setAttribute('title', 'Open organization');
+
+    const openLinkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    openLinkPath.setAttribute('d', 'M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z');
+    openLinkIcon.appendChild(openLinkPath);
+    nameDiv.appendChild(openLinkIcon);
+
     // Add edit icon
     const editIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     editIcon.setAttribute('class', 'edit-icon');
@@ -426,24 +442,6 @@ class OrganizationManager {
     deletePath.setAttribute('d', 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z');
     deleteIcon.appendChild(deletePath);
     nameDiv.appendChild(deleteIcon);
-
-    // Add current label if applicable
-    if (isCurrent) {
-      const currentLabel = document.createElement('span');
-      currentLabel.className = 'current-label';
-      currentLabel.textContent = 'Current';
-      nameDiv.appendChild(document.createTextNode(' '));
-      nameDiv.appendChild(currentLabel);
-    }
-
-    // Add subsite count if applicable
-    if (this.hasSubsites(org)) {
-      const subsiteCount = document.createElement('span');
-      subsiteCount.className = 'subsite-count';
-      const totalCount = this.getTotalCount(org);
-      subsiteCount.textContent = `(${totalCount})`;
-      nameDiv.appendChild(subsiteCount);
-    }
 
     // Add last updated info if available
     if (false && org.lastUpdated) {
@@ -477,11 +475,11 @@ class OrganizationManager {
 
       // Handle new grouped format
       if (org.productGroups && org.productGroups.length > 0) {
-        org.productGroups.forEach(group => {
+        this.sortProductGroups(org.productGroups).forEach(group => {
           const groupElement = this.createProductGroupElement(group, org.id);
           subsitesContainer.appendChild(groupElement);
         });
-      } 
+      }
       // Handle legacy format
       else if (org.subsites && org.subsites.length > 0) {
         org.subsites.forEach(subsite => {
@@ -507,8 +505,11 @@ class OrganizationManager {
     groupContainer.className = 'product-group collapsed'; // Start collapsed
     groupContainer.dataset.productName = group.productName;
 
-    // Separate tenants with and without URLs
-    const tenantsWithUrls = group.tenants.filter(t => t.url);
+    // Separate tenants with and without URLs, sorted Prod, then UAT, then QA,
+    // then everything else (stable, so ties keep their original order).
+    const tenantsWithUrls = group.tenants
+      .filter(t => t.url)
+      .sort((a, b) => this.getEnvironmentInfo(a).rank - this.getEnvironmentInfo(b).rank);
     const tenantsWithoutUrls = group.tenants.filter(t => !t.url);
     const hasHiddenTenants = tenantsWithoutUrls.length > 0;
 
@@ -552,7 +553,7 @@ class OrganizationManager {
     // Add tenant count (only count tenants with URLs)
     const countSpan = document.createElement('span');
     countSpan.className = 'tenant-count';
-    countSpan.textContent = `(${tenantsWithUrls.length})`;
+    countSpan.textContent = `${tenantsWithUrls.length}`;
     headerDiv.appendChild(countSpan);
 
     groupContainer.appendChild(headerDiv);
@@ -634,6 +635,15 @@ class OrganizationManager {
     nameContainer.appendChild(editIcon);
     
     div.appendChild(nameContainer);
+
+    // Add environment badge (Prod/Non-prod), when it can be determined
+    const { badge } = this.getEnvironmentInfo(tenant);
+    if (badge) {
+      const badgeSpan = document.createElement('span');
+      badgeSpan.className = `tenant-badge ${badge}`;
+      badgeSpan.textContent = badge === 'prod' ? 'Prod' : 'Non-prod';
+      div.appendChild(badgeSpan);
+    }
 
     // Tenant quick-action icons hidden for now
     // TODO: Re-enable tenant action links when ready
@@ -773,8 +783,7 @@ class OrganizationManager {
 
     // Create and append organization elements
     sortedOrgs.forEach(org => {
-      const isCurrent = org.url === this.currentUrl;
-      const orgElement = this.createOrganizationElement(org, isCurrent);
+      const orgElement = this.createOrganizationElement(org);
       listElement.appendChild(orgElement);
     });
 
@@ -1058,42 +1067,23 @@ class OrganizationManager {
    * Adds event listeners to organization items
    */
   addEventListeners() {
-    // Handle organization header clicks (expand/collapse)
+    // Handle organization header clicks - clicking anywhere on the row
+    // toggles expand/collapse; opening the organization is a dedicated icon.
     document.querySelectorAll(".org-item.has-subsites .org-header").forEach((header) => {
-      header.addEventListener("click", async (e) => {
-        // Don't expand if delete button was clicked
-        if (e.target.closest(".delete-icon")) return;
-        
+      header.addEventListener("click", (e) => {
+        if (e.target.closest(".delete-icon") || e.target.closest(".open-link-icon")) return;
+
         const orgItem = header.closest(".org-item");
-        
-        // If clicking on expand icon, toggle expansion
-        if (e.target.closest(".expand-icon")) {
-          e.stopPropagation();
-          orgItem.classList.toggle("expanded");
-          return;
-        }
-        
-        // Otherwise, navigate to the organization
-        const url = orgItem.dataset.url;
-        if (url && this.isValidSitecoreUrl(url)) {
-          try {
-            await chrome.tabs.create({ url });
-            window.close();
-          } catch (error) {
-            this.logger.error("Error opening tab", error);
-            this.showError("Failed to open organization");
-          }
-        }
+        orgItem.classList.toggle("expanded");
       });
     });
 
-    // Handle organization clicks (for orgs without subsites)
-    document.querySelectorAll(".org-item:not(.has-subsites)").forEach((item) => {
-      item.addEventListener("click", async (e) => {
-        // Don't navigate if delete button was clicked
-        if (e.target.closest(".delete-icon")) return;
-
-        const url = item.dataset.url;
+    // Handle the open-link icon (navigates to the organization)
+    document.querySelectorAll(".open-link-icon").forEach((icon) => {
+      icon.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const orgItem = icon.closest(".org-item");
+        const url = orgItem.dataset.url;
         if (url && this.isValidSitecoreUrl(url)) {
           try {
             await chrome.tabs.create({ url });
@@ -1232,26 +1222,6 @@ class OrganizationManager {
         });
       });
     });
-  }
-
-  /**
-   * Wraps async operations with timeout handling
-   * @param {Promise} operation - Promise to wrap
-   * @param {number} timeoutMs - Timeout in milliseconds
-   * @param {string} operationName - Name for error reporting
-   * @returns {Promise} Operation result or timeout error
-   */
-  async withTimeout(operation, timeoutMs, operationName) {
-    const timeoutPromise = new Promise((_, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error(`Operation '${operationName}' timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-      
-      // Store timeout ID for cleanup
-      operation.finally?.(() => clearTimeout(timeoutId));
-    });
-    
-    return Promise.race([operation, timeoutPromise]);
   }
 
   /**

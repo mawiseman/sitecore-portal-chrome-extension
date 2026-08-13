@@ -34,10 +34,26 @@ class StorageConsistencyManager {
    * Initialize consistency management
    */
   initializeConsistencyManagement() {
-    // Periodic integrity checks
-    setInterval(() => {
+    // Periodic integrity checks. Each content-script injection (i.e. each open
+    // portal.sitecorecloud.io tab) creates its own StorageConsistencyManager,
+    // so this must stop itself once the extension context is invalidated
+    // (e.g. reloaded/updated while the tab stays open) - otherwise it keeps
+    // firing against a dead context forever, logging warnings every interval.
+    this.integrityCheckIntervalId = setInterval(() => {
+      if (typeof contextValidator !== 'undefined' && !contextValidator.isExtensionContextValid()) {
+        clearInterval(this.integrityCheckIntervalId);
+        this.integrityCheckIntervalId = null;
+        this.logger.debug('Stopped integrity checks - extension context invalidated');
+        return;
+      }
       this.performIntegrityCheck();
     }, this.config.integrityCheckInterval);
+
+    // Stop cleanly on normal page/tab teardown too
+    if (typeof memoryManager !== 'undefined' && typeof window !== 'undefined') {
+      memoryManager.addEventListener(window, 'beforeunload', () => this.destroy());
+      memoryManager.addEventListener(window, 'pagehide', () => this.destroy());
+    }
 
     this.logger.info('Storage consistency management initialized');
   }
@@ -520,7 +536,12 @@ class StorageConsistencyManager {
    */
   destroy() {
     this.logger.info('Destroying storage consistency manager');
-    
+
+    if (this.integrityCheckIntervalId) {
+      clearInterval(this.integrityCheckIntervalId);
+      this.integrityCheckIntervalId = null;
+    }
+
     // Release all locks
     for (const [key, lock] of this.locks.entries()) {
       this.releaseLock(key, lock.id);

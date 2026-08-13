@@ -266,6 +266,11 @@ class SecurityUtils {
     }
     sanitized.organizationId = tenant.organizationId;
 
+    // Environment classification is a controlled enum, not free text - whitelist it
+    if (tenant.environmentType === 'prod' || tenant.environmentType === 'nonprod') {
+      sanitized.environmentType = tenant.environmentType;
+    }
+
     // Validate actions
     if (tenant.actions && Array.isArray(tenant.actions)) {
       sanitized.actions = tenant.actions.map(action => this.validateActionData(action, { autoAdded }));

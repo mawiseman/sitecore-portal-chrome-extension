@@ -230,6 +230,16 @@ class SitecoreOrganizationDetector {
             };
           }
           
+          // Environment classification comes from a node label whose key ends in
+          // "CustomerEnvironmentType" (sometimes namespaced per-product, e.g.
+          // "XMCloud.CustomerEnvironmentType") - not from displayName text.
+          const environmentLabel = (node.labels || []).find((label) =>
+            /customerenvironmenttype$/i.test(label?.key || '')
+          );
+          const environmentType = environmentLabel
+            ? (environmentLabel.value === 'prod' ? 'prod' : 'nonprod')
+            : undefined;
+
           // Create and validate tenant data
           const tenantData = {
             id: node.id,
@@ -237,6 +247,7 @@ class SitecoreOrganizationDetector {
             displayName: node.displayName || mainAction.displayName,
             url: mainAction.link?.to || null,
             organizationId: node.organizationId,
+            environmentType,
             actions: actions.map(action => ({
               name: action.name,
               displayName: action.displayName,

@@ -109,7 +109,10 @@ class Configuration {
         DEBOUNCE_DELAY: 300,
         SCROLL_THRESHOLD: 100,
         MAX_DISPLAY_NAME_LENGTH: 50,
-        MAX_SEARCH_RESULTS: 20
+        MAX_SEARCH_RESULTS: 20,
+        // Shared between the popup and the live-page grouping content script
+        // (appsPanelGrouping.js) so both surfaces order products identically.
+        PRODUCT_ORDER: ['SitecoreAI', 'Search', 'Personalize', 'CDP', 'OrderCloud', 'Connect', 'Stream']
       },
 
       // Security Settings
@@ -365,6 +368,20 @@ class Configuration {
    */
   getAllowedDomains() {
     return this.get('ALLOWED_DOMAINS', []);
+  }
+
+  /**
+   * Rank a product name by its position in UI.PRODUCT_ORDER (case-insensitive).
+   * Shared by the popup and the live-page grouping content script
+   * (appsPanelGrouping.js) so both surfaces order products identically.
+   * @param {string} label - Product name (e.g. "SitecoreAI")
+   * @returns {number} Index in PRODUCT_ORDER, or the list's length if unmatched
+   *   (so unrecognized products sort after everything else)
+   */
+  getProductRank(label) {
+    const order = this.get('UI.PRODUCT_ORDER', []);
+    const idx = order.findIndex(p => p.toLowerCase() === (label || '').toLowerCase());
+    return idx === -1 ? order.length : idx;
   }
 
   /**
