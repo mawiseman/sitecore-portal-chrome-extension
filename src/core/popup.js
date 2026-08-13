@@ -335,7 +335,7 @@ class OrganizationManager {
    */
   getTotalCount(org) {
     if (org.productGroups && org.productGroups.length > 0) {
-      return org.productGroups.reduce((sum, group) => sum + group.tenants.length, 0);
+      return org.productGroups.reduce((sum, group) => sum + group.tenants.filter(t => t.url).length, 0);
     } else if (org.subsites && org.subsites.length > 0) {
       return org.subsites.length;
     }
@@ -355,7 +355,7 @@ class OrganizationManager {
     if (this.hasSubsites(org)) {
       li.className += ' has-subsites';
     }
-    li.dataset.url = org.url;
+    li.dataset.url = org.url || '';
     li.dataset.orgId = org.id;
 
     // Create header container
@@ -478,7 +478,7 @@ class OrganizationManager {
       // Handle new grouped format
       if (org.productGroups && org.productGroups.length > 0) {
         org.productGroups.forEach(group => {
-          const groupElement = this.createProductGroupElement(group);
+          const groupElement = this.createProductGroupElement(group, org.id);
           subsitesContainer.appendChild(groupElement);
         });
       } 
@@ -499,12 +499,18 @@ class OrganizationManager {
   /**
    * Creates a DOM element for a product group
    * @param {Object} group - Product group object
+   * @param {string} orgId - Organization ID for constructing portal refresh link
    * @returns {HTMLElement} Product group element
    */
-  createProductGroupElement(group) {
+  createProductGroupElement(group, orgId) {
     const groupContainer = document.createElement('div');
     groupContainer.className = 'product-group collapsed'; // Start collapsed
     groupContainer.dataset.productName = group.productName;
+
+    // Separate tenants with and without URLs
+    const tenantsWithUrls = group.tenants.filter(t => t.url);
+    const tenantsWithoutUrls = group.tenants.filter(t => !t.url);
+    const hasHiddenTenants = tenantsWithoutUrls.length > 0;
 
     // Create product header
     const headerDiv = document.createElement('div');
@@ -514,7 +520,7 @@ class OrganizationManager {
     const expandSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     expandSvg.setAttribute('class', 'product-expand-icon');
     expandSvg.setAttribute('viewBox', '0 0 24 24');
-    
+
     const expandPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     expandPath.setAttribute('d', 'M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z');
     expandSvg.appendChild(expandPath);
@@ -543,10 +549,10 @@ class OrganizationManager {
     nameSpan.textContent = SecurityUtils.decodeHtmlEntities(group.productName);
     headerDiv.appendChild(nameSpan);
 
-    // Add tenant count
+    // Add tenant count (only count tenants with URLs)
     const countSpan = document.createElement('span');
     countSpan.className = 'tenant-count';
-    countSpan.textContent = `(${group.tenants.length})`;
+    countSpan.textContent = `(${tenantsWithUrls.length})`;
     headerDiv.appendChild(countSpan);
 
     groupContainer.appendChild(headerDiv);
@@ -556,10 +562,37 @@ class OrganizationManager {
     tenantsList.className = 'tenants-list';
     tenantsList.classList.add('hidden'); // Hidden by default
 
-    group.tenants.forEach(tenant => {
+    // Only render tenants that have URLs
+    tenantsWithUrls.forEach(tenant => {
       const tenantElement = this.createTenantElement(tenant);
       tenantsList.appendChild(tenantElement);
     });
+
+    // If some tenants were hidden due to missing URLs, show a refresh prompt
+    if (hasHiddenTenants) {
+      const refreshPrompt = document.createElement('div');
+      refreshPrompt.className = 'refresh-prompt';
+
+      const hiddenCount = tenantsWithoutUrls.length;
+      const message = document.createElement('span');
+      message.className = 'refresh-prompt-text';
+      message.textContent = `${hiddenCount} tenant${hiddenCount > 1 ? 's' : ''} hidden (no URL). `;
+
+      const link = document.createElement('a');
+      link.className = 'refresh-prompt-link';
+      link.href = '#';
+      link.textContent = 'Visit Sitecore Portal to refresh';
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const portalUrl = `https://portal.sitecorecloud.io/?organization=${encodeURIComponent(orgId)}`;
+        chrome.tabs.create({ url: portalUrl });
+      });
+
+      refreshPrompt.appendChild(message);
+      refreshPrompt.appendChild(link);
+      tenantsList.appendChild(refreshPrompt);
+    }
 
     groupContainer.appendChild(tenantsList);
 
@@ -580,7 +613,7 @@ class OrganizationManager {
     // Add tenant name with edit functionality
     const nameContainer = document.createElement('div');
     nameContainer.className = 'tenant-name-container';
-    nameContainer.dataset.url = tenant.url;
+    nameContainer.dataset.url = tenant.url || '';
     
     const nameSpan = document.createElement('span');
     nameSpan.className = tenant.customName ? 'tenant-name custom' : 'tenant-name';
@@ -602,52 +635,8 @@ class OrganizationManager {
     
     div.appendChild(nameContainer);
 
-    // Add actions if available (excluding the main action which is category "Direct Links")
-    if (tenant.actions && tenant.actions.length > 1) {
-      const actionsContainer = document.createElement('div');
-      actionsContainer.className = 'tenant-actions';
-      
-      // Filter out the main action (category "Direct Links") and show Quick Actions and Helpful links
-      const secondaryActions = tenant.actions.filter(action => 
-        action.category === 'Quick Actions'
-      );
-      
-      secondaryActions.forEach(action => {
-        if (action.url) {
-          try {
-            const sanitizedUrl = SecurityUtils.validateAndSanitizeUrl(action.url, {
-              allowExternalUrls: true, // Allow external URLs for action links like documentation
-              strictMode: true,
-              checkMaliciousPatterns: true
-            });
-            const actionLink = document.createElement('a');
-            actionLink.href = sanitizedUrl;
-            actionLink.target = '_blank';
-            actionLink.className = 'tenant-action-link';
-              actionLink.title = SecurityUtils.decodeHtmlEntities(action.name);
-            
-            // Create icon using first letter of action name
-            const icon = document.createElement('span');
-            icon.className = 'tenant-action-icon text-icon';
-            
-            // Always use first letter of action name
-            const decodedName = SecurityUtils.decodeHtmlEntities(action.name);
-            icon.textContent = decodedName.charAt(0).toUpperCase();
-            icon.title = decodedName; // Show full action name in tooltip
-            
-            actionLink.appendChild(icon);
-            actionsContainer.appendChild(actionLink);
-          } catch (urlError) {
-            this.logger.warn(`Skipping invalid action URL: ${action.url} - ${urlError.message}`, { action });
-            // Skip this action if URL validation fails
-          }
-        }
-      });
-      
-      if (secondaryActions.length > 0) {
-        div.appendChild(actionsContainer);
-      }
-    }
+    // Tenant quick-action icons hidden for now
+    // TODO: Re-enable tenant action links when ready
 
     return div;
   }
@@ -684,7 +673,7 @@ class OrganizationManager {
   createSubsiteElement(subsite) {
     const div = document.createElement('div');
     div.className = 'subsite-item';
-    div.dataset.url = subsite.url;
+    div.dataset.url = subsite.url || '';
 
     // Add icon based on iconSrc
     if (subsite.iconSrc) {

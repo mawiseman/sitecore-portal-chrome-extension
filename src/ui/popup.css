@@ -642,6 +642,36 @@ img.subsite-icon {
   border-radius: 2px;
 }
 
+/* Refresh prompt for tenants with missing URLs */
+.refresh-prompt {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  margin-top: 4px;
+  background: #fef7e0;
+  border-radius: 4px;
+  border-left: 3px solid #f9ab00;
+  font-size: 11px;
+  color: #5f6368;
+  line-height: 1.4;
+}
+
+.refresh-prompt-text {
+  margin-right: 2px;
+}
+
+.refresh-prompt-link {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.refresh-prompt-link:hover {
+  text-decoration: underline;
+}
+
 /* Utility classes for visibility and display */
 .hidden {
   display: none !important;

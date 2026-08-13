@@ -4,7 +4,9 @@
       "Bash(tree:*)",
       "Bash(python:*)",
       "Bash(find:*)",
-      "Bash(yamllint:*)"
+      "Bash(yamllint:*)",
+      "Bash(dir \"C:\\projects\\sitecore-portal-chrome-extension\\sample-responses\")",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

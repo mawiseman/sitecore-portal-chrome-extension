@@ -42,8 +42,9 @@
         "managers/requestLifecycleManager.js", 
         "managers/storageConsistencyManager.js", 
         "utils/sharedUtils.js", 
-        "managers/memoryManager.js", 
-        "core/content.js"
+        "managers/memoryManager.js",
+        "core/content.js",
+        "core/appsPanelGrouping.js"
       ],
       "run_at": "document_start"
     }
