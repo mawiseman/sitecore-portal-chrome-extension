@@ -2,6 +2,11 @@ class SitecoreOrganizationDetector {
   constructor() {
     this.currentOrgId = null;
     this.logger = Logger.createContextLogger('SitecoreDetector');
+    // Tracks organizations seen across the pages of a single paginated
+    // /user/organizations sync, so we only prune orgs the user no longer has
+    // access to once every page has been observed - see processOrganizationsData.
+    this.orgSyncSeenOrgs = new Map();
+    this.orgSyncTotalRecords = null;
     this.interceptRequests();
     this.initCurrentOrgId();
   }
@@ -166,12 +171,34 @@ class SitecoreOrganizationDetector {
       // Get existing organizations using shared storage manager
       const existingOrgs = await storageManager.getOrganizations();
 
-      // Merge organizations using shared data processor
-      const mergedOrgs = DataProcessor.mergeOrganizations(existingOrgs, processedOrgs);
-      
+      // Merge organizations using shared data processor (additive - never
+      // drops orgs here, since a single response may only be one page)
+      let finalOrgs = DataProcessor.mergeOrganizations(existingOrgs, processedOrgs);
+
+      // The /user/organizations endpoint is paginated. Track org IDs seen
+      // across pages of the same sync so we only prune orgs the user no
+      // longer has access to once we've confirmed we've seen every page -
+      // pruning against a single partial page would drop orgs that just
+      // haven't loaded yet.
+      const totalRecords = typeof responseData?.totalRecords === 'number' ? responseData.totalRecords : null;
+      const pageNumber = typeof responseData?.pageNumber === 'number' ? responseData.pageNumber : null;
+
+      if (totalRecords !== null && pageNumber !== null) {
+        if (pageNumber === 1 || this.orgSyncTotalRecords !== totalRecords) {
+          this.orgSyncSeenOrgs = new Map();
+          this.orgSyncTotalRecords = totalRecords;
+        }
+
+        processedOrgs.forEach(org => this.orgSyncSeenOrgs.set(org.id, org));
+
+        if (this.orgSyncSeenOrgs.size >= totalRecords) {
+          finalOrgs = DataProcessor.pruneRemovedOrganizations(finalOrgs, Array.from(this.orgSyncSeenOrgs.values()));
+        }
+      }
+
       // Save using shared storage manager
-      const success = await storageManager.saveOrganizations(mergedOrgs);
-      
+      const success = await storageManager.saveOrganizations(finalOrgs);
+
       if (success) {
         this.logger.info(`Successfully processed and saved ${processedOrgs.length} organizations`);
       } else {

@@ -776,9 +776,9 @@ class OrganizationManager {
       existingGuidance.remove();
     }
 
-    // Sort organizations alphabetically by name
-    const sortedOrgs = [...this.organizations].sort((a, b) => 
-      a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+    // Sort organizations alphabetically by displayed name (custom name takes priority)
+    const sortedOrgs = [...this.organizations].sort((a, b) =>
+      (a.customName || a.name).toLowerCase().localeCompare((b.customName || b.name).toLowerCase())
     );
 
     // Create and append organization elements

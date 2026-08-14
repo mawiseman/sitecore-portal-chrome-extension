@@ -569,10 +569,10 @@ class DataProcessor {
    */
   static mergeOrganizations(existing, newOrgs) {
     const merged = [...existing];
-    
+
     for (const newOrg of newOrgs) {
       const existingIndex = merged.findIndex(org => org.id === newOrg.id);
-      
+
       if (existingIndex >= 0) {
         // Update existing with new data, preserve custom fields
         merged[existingIndex] = {
@@ -589,8 +589,22 @@ class DataProcessor {
         });
       }
     }
-    
+
     return merged;
+  }
+
+  /**
+   * Drop organizations that are no longer present in the complete set of
+   * organizations the user currently has access to. Only call this once the
+   * complete set has actually been observed (e.g. all pages of a paginated
+   * listing) - passing a partial set here will incorrectly remove orgs.
+   * @param {Array} existing - Existing organizations
+   * @param {Array} completeAccessibleOrgs - The full, complete set of organizations the user has access to
+   * @returns {Array} Existing organizations filtered down to those still accessible
+   */
+  static pruneRemovedOrganizations(existing, completeAccessibleOrgs) {
+    const accessibleIds = new Set(completeAccessibleOrgs.map(org => org.id));
+    return existing.filter(org => accessibleIds.has(org.id));
   }
 
   /**
